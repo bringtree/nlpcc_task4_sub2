@@ -84,4 +84,4 @@ if __name__ == '__main__':
     for v in not_cut_sentences:
         cut_sentences.append(jieba.lcut(v))
     train_test_X, train_test_Y, dev_X, dev_Y = k_fold(5, cut_sentences, label)
-    train_X, train_Y, test_X, test_Y = k_fold(10, cut_sentences, label)
+    train_X, train_Y, test_X, test_Y = k_fold(10, train_test_X[0], train_test_Y[0])
