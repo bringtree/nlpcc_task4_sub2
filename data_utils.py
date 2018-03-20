@@ -65,7 +65,7 @@ def merge_data(x, slot, y):
         merge_data = []
         for idx in range(len(x)):
             merge_data.append(
-                "BOS " + " ".join(x[idx]).replace('\n', '') + " EOS\tO " + " ".join(slot[idx]).replace('\n', '') + " " +
+                "BOS " + " ".join(x[idx]).replace('\n', '') + " EOS O " + " ".join(slot[idx]).replace('\n', '') + " " +
                 y[idx] + '\n')
     else:
         merge_data = []
@@ -75,11 +75,31 @@ def merge_data(x, slot, y):
     return merge_data
 
 
-with open("train_data.iob", "w") as fp:
-    fp.writelines(merge_data(train_X[0], train_slot_sentences[0], train_Y[0]))
+with open("train.label", "w") as fp:
+    fp.writelines([v + '\n' for v in train_Y[0]])
 
-with open("dev_data.iob", "w") as fp:
-    fp.writelines(merge_data(dev_X[0], dev_slot_sentences[0], dev_Y[0]))
+with open("train.seq.in", "w") as fp:
+    fp.writelines([" ".join(v)+'\n' for v in (train_X[0])])
 
-with open("test_data.iob", "w") as fp:
-    fp.writelines(merge_data(test_X[0], test_slot_sentences[0], test_Y[0]))
+with open("train.seq.out", "w") as fp:
+    fp.writelines([" ".join(v)+'\n' for v in (train_slot_sentences[0])])
+
+
+with open("valid.label", "w") as fp:
+    fp.writelines([v + '\n' for v in dev_Y[0]])
+
+with open("valid.seq.in", "w") as fp:
+    fp.writelines([" ".join(v)+'\n' for v in ((dev_X[0]))])
+
+with open("valid.seq.out", "w") as fp:
+    fp.writelines([" ".join(v)+'\n' for v in (dev_slot_sentences[0])])
+
+
+with open("test.label", "w") as fp:
+    fp.writelines([v + '\n' for v in test_Y[0]])
+
+with open("test.seq.in", "w") as fp:
+    fp.writelines([" ".join(v)+'\n' for v in (test_X[0])])
+
+with open("test.seq.out", "w") as fp:
+    fp.writelines([" ".join(v)+'\n' for v in (test_slot_sentences[0])])
