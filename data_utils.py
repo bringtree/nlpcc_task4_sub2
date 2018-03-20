@@ -5,7 +5,7 @@ import random
 
 
 # K折
-def k_fold(k, X, Y):
+def k_fold(k, X, Y, slot_sentences=None):
     """
     按照数据的标签比值分割数据
     用于生成训练出训练集合测试集数据
@@ -20,8 +20,10 @@ def k_fold(k, X, Y):
     test_index = []
 
     train_X = []
+    train_slot_sentences = []
     train_Y = []
     test_X = []
+    test_slot_sentences = []
     test_Y = []
 
     for x, y in sfolder.split(X, Y):
@@ -31,57 +33,53 @@ def k_fold(k, X, Y):
     for i in range(len(test_index)):
         test_X.append([X[v] for v in test_index[i]])
         test_Y.append([Y[v] for v in test_index[i]])
-
+        if slot_sentences:
+            test_slot_sentences.append([slot_sentences[v] for v in test_index[i]])
     for i in range(len(train_index)):
         train_X.append([X[v] for v in train_index[i]])
         train_Y.append([Y[v] for v in train_index[i]])
-
+        if slot_sentences:
+            train_slot_sentences.append([slot_sentences[v] for v in train_index[i]])
+    if slot_sentences:
+        return train_X, train_slot_sentences, train_Y, test_X, test_slot_sentences, test_Y
     return train_X, train_Y, test_X, test_Y
 
 
-if __name__ == '__main__':
+with open("test_data.txt") as fp:
+    raw_data = [v.split(' ') for v in fp.readlines()]
 
-    # 读取出没有处理过的句子和标签
-    row_data = []
-    with open("corpus.train.txt") as fp:
-        tmp = fp.readlines()
-        for v in tmp:
-            if v == '\n':
-                continue
-            row_data.append(v.split('\t'))
+sentences = [v[1:v.index("EOS")] for v in raw_data]
+slot_sentences = [v[v.index("EOS") + 1:-1] for v in raw_data]
+labels = [v[-1].replace('\n', '') for v in raw_data]
 
-    not_cut_sentences = [v[1] for v in row_data]
-    label = [v[2] for v in row_data]
+train_test_X, train_test_slot_sentences, train_test_Y, dev_X, dev_slot_sentences, dev_Y = k_fold(5, X=sentences,
+                                                                                                 Y=labels,
+                                                                                                 slot_sentences=slot_sentences)
+train_X, train_slot_sentences, train_Y, test_X, test_slot_sentences, test_Y = k_fold(10, X=train_test_X[0],
+                                                                                     Y=train_test_Y[0],
+                                                                                     slot_sentences=slot_sentences)
 
-    # 添加专有名字到jieba中，并且分词
-    slot_file = ['toplist.txt',
-                 'theme.txt',
-                 'style.txt',
-                 'song.txt',
-                 'singer.txt',
-                 'scene.txt',
-                 'language.txt',
-                 'instrument.txt',
-                 'emotion.txt',
-                 'custom_destination.txt',
-                 'age.txt']
-    slot_dict = {}
-    for v in slot_file:
-        with open("slot/" + str(v)) as fp:
-            tmp = [v.replace('\n', '') for v in fp.readlines()]
-            type_set = set(tmp)
-            slot_dict[v[:-4]] = type_set
 
-    jieba.del_word('我们不一样')
-    for v in slot_dict:
-        for v_v in slot_dict[v]:
-            jieba.add_word(v_v)
-    print(jieba.lcut('我们不一样'))
+def merge_data(x, slot, y):
+    if slot is not None:
+        merge_data = []
+        for idx in range(len(x)):
+            merge_data.append(
+                "BOS " + " ".join(x[idx]).replace('\n', '') + " EOS\tO " + " ".join(slot[idx]).replace('\n', '') + " " +
+                y[idx] + '\n')
+    else:
+        merge_data = []
+        for idx in range(len(x)):
+            merge_data.append(
+                "BOS " + " ".join(x[idx]).replace('\n', '') + " EOS " + y[idx] + '\n')
+    return merge_data
 
-    # end_senteces是全部的句子
-    # label 是全部的意图
-    cut_sentences = []
-    for v in not_cut_sentences:
-        cut_sentences.append(jieba.lcut(v))
-    train_test_X, train_test_Y, dev_X, dev_Y = k_fold(5, cut_sentences, label)
-    train_X, train_Y, test_X, test_Y = k_fold(10, train_test_X[0], train_test_Y[0])
+
+with open("train_data.iob", "w") as fp:
+    fp.writelines(merge_data(train_X[0], train_slot_sentences[0], train_Y[0]))
+
+with open("dev_data.iob", "w") as fp:
+    fp.writelines(merge_data(dev_X[0], dev_slot_sentences[0], dev_Y[0]))
+
+with open("test_data.iob", "w") as fp:
+    fp.writelines(merge_data(test_X[0], test_slot_sentences[0], test_Y[0]))
