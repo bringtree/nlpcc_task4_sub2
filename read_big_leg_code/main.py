@@ -1,27 +1,26 @@
 # coding=utf-8
 # @author: cer
 import tensorflow as tf
-from data import *
+from read_big_leg_code.data import *
 # from model import Model
 from read_big_leg_code.model import Model
 from read_big_leg_code.my_metrics import *
 from tensorflow.python import debug as tf_debug
 import numpy as np
 
-input_steps = 50
-embedding_size = 64
+input_steps = 30
+embedding_size = 100
 hidden_size = 100
-n_layers = 2
-batch_size = 16
-vocab_size = 871
-slot_size = 122
-intent_size = 22
+batch_size = 64
+vocab_size = 12021
+slot_size = 30
+intent_size = 11
 epoch_num = 50
 
 
 def get_model():
     model = Model(input_steps, embedding_size, hidden_size, vocab_size, slot_size,
-                 intent_size, epoch_num, batch_size, n_layers)
+                 intent_size, epoch_num, batch_size)
     model.build()
     return model
 
@@ -34,10 +33,13 @@ def train(is_debug=False):
         sess.add_tensor_filter("has_inf_or_nan", tf_debug.has_inf_or_nan)
     sess.run(tf.global_variables_initializer())
     # print(tf.trainable_variables())
-    train_data = open("train_data.iob", "r").readlines()
-    test_data = open("test_data.iob", "r").readlines()
-    train_data_ed = data_pipeline(train_data)
-    test_data_ed = data_pipeline(test_data)
+    # train_data = open("/Users/huangpeisong/Desktop/task-slu-tencent.dingdang/rnn/read_big_leg_code/train_data.iob", "r").readlines()
+    # test_data = open("/Users/huangpeisong/Desktop/task-slu-tencent.dingdang/rnn/read_big_leg_code/test_data.iob", "r").readlines()
+    # train_data_ed = data_pipeline(train_data,input_steps)
+    # test_data_ed = data_pipeline(test_data,input_steps)
+
+    train_data_ed = data_pipeline(length = input_steps)
+    test_data_ed = data_pipeline(length = input_steps)
     word2index, index2word, slot2index, index2slot, intent2index, index2intent = \
         get_info_from_training_data(train_data_ed)
     # print("slot2index: ", slot2index)

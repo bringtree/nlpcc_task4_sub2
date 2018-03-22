@@ -9,11 +9,10 @@ import sys
 
 class Model:
     def __init__(self, input_steps, embedding_size, hidden_size, vocab_size, slot_size,
-                 intent_size, epoch_num, batch_size=16, n_layers=1):
+                 intent_size, epoch_num, batch_size=16):
         self.input_steps = input_steps
         self.embedding_size = embedding_size
         self.hidden_size = hidden_size
-        self.n_layers = n_layers
         self.batch_size = batch_size
         self.vocab_size = vocab_size
         self.slot_size = slot_size
@@ -152,6 +151,10 @@ class Model:
                     initial_state=out_cell.zero_state(
                         dtype=tf.float32, batch_size=self.batch_size))
                 # initial_state=encoder_final_state)
+
+                # final_outputs =[shape=(?, 16, 122),shape=(?, 16)]
+                # final_state = [shape=(16, 200),shape=(16, 100) ]
+                # final_sequence_lengths = [shape=(16,)
                 final_outputs, final_state, final_sequence_lengths = tf.contrib.seq2seq.dynamic_decode(
                     decoder=decoder, output_time_major=True,
                     impute_finished=True, maximum_iterations=self.input_steps
@@ -164,6 +167,7 @@ class Model:
         print("outputs.sample_id: ", outputs.sample_id)
         # weights = tf.to_float(tf.not_equal(outputs[:, :-1], 0))
         self.decoder_prediction = outputs.sample_id
+        # max_step对应的是slot输出 batch_size 是句子 dim是输出
         decoder_max_steps, decoder_batch_size, decoder_dim = tf.unstack(tf.shape(outputs.rnn_output))
         self.decoder_targets_time_majored = tf.transpose(self.decoder_targets, [1, 0])
         self.decoder_targets_true_length = self.decoder_targets_time_majored[:decoder_max_steps]
