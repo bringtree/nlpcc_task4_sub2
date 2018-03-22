@@ -15,3 +15,6 @@
 
 求助中。。。
 https://github.com/applenob/RNN-for-Joint-NLU/issues/6
+
+记录一个bug
+还没有做

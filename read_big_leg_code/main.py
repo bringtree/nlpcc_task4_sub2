@@ -7,6 +7,7 @@ from read_big_leg_code.model import Model
 from read_big_leg_code.my_metrics import *
 from tensorflow.python import debug as tf_debug
 import numpy as np
+from data_utils import k_fold
 
 input_steps = 30
 embedding_size = 100
@@ -17,10 +18,39 @@ slot_size = 30
 intent_size = 11
 epoch_num = 50
 
+# 这块到时候替换掉 ~~~~~~~~~~~~~~~~
+with open("test_data.txt") as fp:
+    raw_data = [v.split(' ') for v in fp.readlines()]
+
+sentences = [v[1:v.index("EOS")] for v in raw_data]
+slot_sentences = [v[v.index("EOS") + 2:-1] for v in raw_data]
+labels = [v[-1].replace('\n', '') for v in raw_data]
+
+train_X, train_slot_sentences, train_Y, test_X, test_slot_sentences, test_Y = k_fold(5, X=sentences, Y=labels,
+                                                                                     slot_sentences=slot_sentences)
+
+train_data = []
+for idx in range(len(train_X[0])):
+    tmp = []
+    tmp.append(test_X[0][idx])
+    tmp.append(train_slot_sentences[0][idx])
+    tmp.append(train_Y[0][idx])
+    train_data.append(tmp)
+
+test_data = []
+for idx in range(len(test_X[0])):
+    tmp = []
+    tmp.append(train_X[0][idx])
+    tmp.append(test_slot_sentences[0][idx])
+    tmp.append(test_Y[0][idx])
+    test_data.append(tmp)
+
+
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 def get_model():
     model = Model(input_steps, embedding_size, hidden_size, vocab_size, slot_size,
-                 intent_size, epoch_num, batch_size)
+                  intent_size, epoch_num, batch_size)
     model.build()
     return model
 
@@ -38,14 +68,16 @@ def train(is_debug=False):
     # train_data_ed = data_pipeline(train_data,input_steps)
     # test_data_ed = data_pipeline(test_data,input_steps)
 
-    train_data_ed = data_pipeline(length = input_steps)
-    test_data_ed = data_pipeline(length = input_steps)
+    train_data_ed = data_pipeline(train_data, length=input_steps)
+    test_data_ed = data_pipeline(test_data, length=input_steps)
     word2index, index2word, slot2index, index2slot, intent2index, index2intent = \
         get_info_from_training_data(train_data_ed)
     # print("slot2index: ", slot2index)
     # print("index2slot: ", index2slot)
+    print("run ")
     index_train = to_index(train_data_ed, word2index, slot2index, intent2index)
     index_test = to_index(test_data_ed, word2index, slot2index, intent2index)
+    print("run ")
     for epoch in range(epoch_num):
         mean_loss = 0.0
         train_loss = 0.0
@@ -95,7 +127,7 @@ def train(is_debug=False):
                 print("Intent Truth          : ", index2intent[batch[index][3]])
                 print("Intent Prediction     : ", index2intent[intent[index]])
             slot_pred_length = list(np.shape(decoder_prediction))[1]
-            pred_padded = np.lib.pad(decoder_prediction, ((0, 0), (0, input_steps-slot_pred_length)),
+            pred_padded = np.lib.pad(decoder_prediction, ((0, 0), (0, input_steps - slot_pred_length)),
                                      mode="constant", constant_values=0)
             pred_slots.append(pred_padded)
             # print("slot_pred_length: ", slot_pred_length)
@@ -121,8 +153,10 @@ def train(is_debug=False):
 def test_data():
     # train_data = open("dataset/atis-2.train.w-intent.iob", "r").readlines()
     # test_data = open("dataset/atis-2.dev.w-intent.iob", "r").readlines()
-    train_data_ed = data_pipeline(length=slot_size)
-    test_data_ed = data_pipeline(length=slot_size)
+
+
+    train_data_ed = data_pipeline(train_data, input_steps)
+    test_data_ed = data_pipeline(test_data, input_steps)
     word2index, index2word, slot2index, index2slot, intent2index, index2intent = \
         get_info_from_training_data(train_data_ed)
     # print("slot2index: ", slot2index)
