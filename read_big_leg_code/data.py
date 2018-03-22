@@ -10,24 +10,12 @@ index_seq2slot = lambda s, index2slot: [index2slot[i] for i in s]
 index_seq2word = lambda s, index2word: [index2word[i] for i in s]
 
 
-def data_pipeline(data=None, length=50):
+def data_pipeline(data, length=50):
     # data = [t[:-1] for t in data]  # 去掉'\n'
     # 数据的一行像这样：'BOS i want to fly from baltimore to dallas round trip EOS
     # \tO O O O O O B-fromloc.city_name O B-toloc.city_name B-round_trip I-round_trip atis_flight'
     # 分割成这样[原始句子的词，标注的序列，intent]
-    with open("test_data.txt") as fp:
-        raw_data = [v.split(' ') for v in fp.readlines()]
 
-    sentences = [v[1:v.index("EOS")] for v in raw_data]
-    slot_sentences = [v[v.index("EOS") + 2:-1] for v in raw_data]
-    labels = [v[-1].replace('\n', '') for v in raw_data]
-    data = []
-    for idx in range(len(sentences)):
-        tmp = []
-        tmp.append(sentences)
-        tmp.append(slot_sentences)
-        tmp.append(labels)
-        data.append(tmp)
     seq_in, seq_out, intent = list(zip(*data))
     sin = []
     sout = []
