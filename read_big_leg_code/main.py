@@ -3,8 +3,8 @@
 import tensorflow as tf
 from data import *
 # from model import Model
-from model import Model
-from my_metrics import *
+from read_big_leg_code.model import Model
+from read_big_leg_code.my_metrics import *
 from tensorflow.python import debug as tf_debug
 import numpy as np
 
