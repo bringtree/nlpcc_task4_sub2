@@ -119,10 +119,10 @@ def train(is_debug=False):
 
 
 def test_data():
-    train_data = open("dataset/atis-2.train.w-intent.iob", "r").readlines()
-    test_data = open("dataset/atis-2.dev.w-intent.iob", "r").readlines()
-    train_data_ed = data_pipeline(train_data)
-    test_data_ed = data_pipeline(test_data)
+    # train_data = open("dataset/atis-2.train.w-intent.iob", "r").readlines()
+    # test_data = open("dataset/atis-2.dev.w-intent.iob", "r").readlines()
+    train_data_ed = data_pipeline(length=slot_size)
+    test_data_ed = data_pipeline(length=slot_size)
     word2index, index2word, slot2index, index2slot, intent2index, index2intent = \
         get_info_from_training_data(train_data_ed)
     # print("slot2index: ", slot2index)
