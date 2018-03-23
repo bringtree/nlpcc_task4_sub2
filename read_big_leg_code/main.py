@@ -40,7 +40,7 @@ for idx in range(len(train_X[0])):
 test_data = []
 for idx in range(len(test_X[0])):
     tmp = []
-    tmp.append(train_X[0][idx])
+    tmp.append(test_X[0][idx])
     tmp.append(test_slot_sentences[0][idx])
     tmp.append(test_Y[0][idx])
     test_data.append(tmp)
@@ -115,7 +115,7 @@ def train(is_debug=False):
         slot_accs = []
         intent_accs = []
         for j, batch in enumerate(getBatch(batch_size, index_test)):
-            decoder_prediction, intent = model.step(sess, "test", batch)
+            loss,decoder_prediction, intent,mask,slot_W = model.step(sess, "train", batch)
             decoder_prediction = np.transpose(decoder_prediction, [1, 0])
             if j == 0:
                 index = random.choice(range(len(batch)))
@@ -150,25 +150,25 @@ def train(is_debug=False):
         print("Slot F1 score for epoch {}: {}".format(epoch, f1_for_sequence_batch(true_slots_a, pred_slots_a)))
 
 
-def test_data():
-    # train_data = open("dataset/atis-2.train.w-intent.iob", "r").readlines()
-    # test_data = open("dataset/atis-2.dev.w-intent.iob", "r").readlines()
-    train_data_ed = data_pipeline(train_data, input_steps)
-    test_data_ed = data_pipeline(test_data, input_steps)
-    word2index, index2word, slot2index, index2slot, intent2index, index2intent = \
-        get_info_from_training_data(train_data_ed)
-    # print("slot2index: ", slot2index)
-    # print("index2slot: ", index2slot)
-    index_train = to_index(train_data_ed, word2index, slot2index, intent2index)
-    index_test = to_index(test_data_ed, word2index, slot2index, intent2index)
-    batch = next(getBatch(batch_size, index_test))
-    unziped = list(zip(*batch))
-    print("word num: ", len(word2index.keys()), "slot num: ", len(slot2index.keys()), "intent num: ",
-          len(intent2index.keys()))
-    print(np.shape(unziped[0]), np.shape(unziped[1]), np.shape(unziped[2]), np.shape(unziped[3]))
-    print(np.transpose(unziped[0], [1, 0]))
-    print(unziped[1])
-    print(np.shape(list(zip(*index_test))[2]))
+# def test_data():
+#     # train_data = open("dataset/atis-2.train.w-intent.iob", "r").readlines()
+#     # test_data = open("dataset/atis-2.dev.w-intent.iob", "r").readlines()
+#     train_data_ed = data_pipeline(train_data, input_steps)
+#     test_data_ed = data_pipeline(test_data, input_steps)
+#     word2index, index2word, slot2index, index2slot, intent2index, index2intent = \
+#         get_info_from_training_data(train_data_ed)
+#     # print("slot2index: ", slot2index)
+#     # print("index2slot: ", index2slot)
+#     index_train = to_index(train_data_ed, word2index, slot2index, intent2index)
+#     index_test = to_index(test_data_ed, word2index, slot2index, intent2index)
+#     batch = next(getBatch(batch_size, index_test))
+#     unziped = list(zip(*batch))
+#     print("word num: ", len(word2index.keys()), "slot num: ", len(slot2index.keys()), "intent num: ",
+#           len(intent2index.keys()))
+#     print(np.shape(unziped[0]), np.shape(unziped[1]), np.shape(unziped[2]), np.shape(unziped[3]))
+#     print(np.transpose(unziped[0], [1, 0]))
+#     print(unziped[1])
+#     print(np.shape(list(zip(*index_test))[2]))
 
 
 if __name__ == '__main__':
