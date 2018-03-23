@@ -1,0 +1,6 @@
+# Created by .ignore support plugin (hsz.mobi)
+.DS_Store
+.gitignore
+.idea/
+*.iob
+read_big_leg_code/__pycache__/
