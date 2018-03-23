@@ -2,7 +2,6 @@
 # @author: cer
 import tensorflow as tf
 from read_big_leg_code.data import *
-# from model import Model
 from read_big_leg_code.model import Model
 from read_big_leg_code.my_metrics import *
 from tensorflow.python import debug as tf_debug
@@ -13,9 +12,9 @@ input_steps = 30
 embedding_size = 100
 hidden_size = 100
 batch_size = 64
+# 这个vocab_size 到时候 会直接就换成 那个很大很大的词向量来处理
 vocab_size = 12021
 slot_size = 30
-intent_size = 11
 epoch_num = 50
 
 # 这块到时候替换掉 ~~~~~~~~~~~~~~~~
@@ -25,8 +24,7 @@ with open("/Users/huangpeisong/Desktop/task-slu-tencent.dingdang/rnn/read_big_le
 sentences = [v[1:v.index("EOS")] for v in raw_data]
 slot_sentences = [v[v.index("EOS") + 2:-1] for v in raw_data]
 labels = [v[-1].replace('\n', '') for v in raw_data]
-
-train_X, train_slot_sentences, train_Y, test_X, test_slot_sentences, test_Y = k_fold(2, X=sentences, Y=labels,
+train_X, train_slot_sentences, train_Y, test_X, test_slot_sentences, test_Y = k_fold(10, X=sentences, Y=labels,
                                                                                      slot_sentences=slot_sentences)
 
 train_data = []
@@ -45,8 +43,19 @@ for idx in range(len(test_X[0])):
     tmp.append(test_Y[0][idx])
     test_data.append(tmp)
 
-
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+train_data_ed = data_pipeline(train_data, length=input_steps)
+test_data_ed = data_pipeline(test_data, length=input_steps)
+
+# 生成6份字典 分别是 句子中的词 -> 序号  序号-> 句子中的词   (slot intent 同理)
+word2index, index2word, slot2index, index2slot, intent2index, index2intent = \
+    get_info_from_training_data(train_data_ed)
+intent_size = len(intent2index)
+
+# 接下来 完成 编码
+index_train = to_index(train_data_ed, word2index, slot2index, intent2index)
+index_test = to_index(test_data_ed, word2index, slot2index, intent2index)
 
 def get_model():
     model = Model(input_steps, embedding_size, hidden_size, vocab_size, slot_size,
@@ -62,53 +71,21 @@ def train(is_debug=False):
         sess = tf_debug.LocalCLIDebugWrapperSession(sess)
         sess.add_tensor_filter("has_inf_or_nan", tf_debug.has_inf_or_nan)
     sess.run(tf.global_variables_initializer())
-    # print(tf.trainable_variables())
-    # train_data = open("/Users/huangpeisong/Desktop/task-slu-tencent.dingdang/rnn/read_big_leg_code/train_data.iob", "r").readlines()
-    # test_data = open("/Users/huangpeisong/Desktop/task-slu-tencent.dingdang/rnn/read_big_leg_code/test_data.iob", "r").readlines()
-    # train_data_ed = data_pipeline(train_data,input_steps)
-    # test_data_ed = data_pipeline(test_data,input_steps)
 
-    train_data_ed = data_pipeline(train_data, length=input_steps)
-    test_data_ed = data_pipeline(test_data, length=input_steps)
-    # 生成6份字典 分别是 句子中的词 -> 序号  序号-> 句子中的词   (slot intent 同理)
-    word2index, index2word, slot2index, index2slot, intent2index, index2intent = \
-        get_info_from_training_data(train_data_ed)
-    # print("slot2index: ", slot2index)
-    # print("index2slot: ", index2slot)
-    # 接下来 完成 编码
-    # index_train = train_data_ed
-    # index_test = test_data_ed
-    index_train = to_index(train_data_ed, word2index, slot2index, intent2index)
-    index_test = to_index(test_data_ed, word2index, slot2index, intent2index)
     for epoch in range(epoch_num):
         mean_loss = 0.0
         train_loss = 0.0
         for i, batch in enumerate(getBatch(batch_size, index_train)):
             # 执行一个batch的训练
-            _, loss, decoder_prediction, intent, mask, slot_W = model.step(sess, "train", batch)
-            if i == 0:
-                index = 0
-                print("training debug:")
-                print("input:", list(zip(*batch))[0][index])
-                print("length:", list(zip(*batch))[1][index])
-                print("mask:", mask[index])
-                print("target:", list(zip(*batch))[2][index])
-                # print("decoder_targets_one_hot:")
-                # for one in decoder_targets_one_hot[index]:
-                #     print(" ".join(map(str, one)))
-                print("decoder_logits: ")
-                # for one in decoder_logits[index]:
-                #     print(" ".join(map(str, one)))
-                print("slot_W:", slot_W)
-                print("decoder_prediction:", decoder_prediction[index])
-                print("intent:", list(zip(*batch))[3][index])
+            _, loss, decoder_prediction, intent, mask = model.step(sess, batch)
             mean_loss += loss
             train_loss += loss
             if i % 10 == 0:
                 if i > 0:
                     mean_loss = mean_loss / 10.0
-                print('Average train loss at epoch %d, step %d: %f' % (epoch, i, mean_loss))
+                print('~~~~~~~~Average train loss at epoch %d, step %d: %f' % (epoch, i, mean_loss))
                 mean_loss = 0
+
         train_loss /= (i + 1)
         print("[Epoch {}] Average train loss: {}".format(epoch, train_loss))
 
@@ -118,7 +95,7 @@ def train(is_debug=False):
         intent_accs = []
         for j, batch in enumerate(getBatch(batch_size, index_test)):
 
-            _, loss, decoder_prediction, intent, mask, slot_W = model.step(sess, 'train', batch)
+            _, loss, decoder_prediction, intent, mask = model.step(sess, batch)
 
             decoder_prediction = np.transpose(decoder_prediction, [1, 0])
             if j == 0:
@@ -153,28 +130,7 @@ def train(is_debug=False):
         print("Slot accuracy for epoch {}: {}".format(epoch, np.average(slot_accs)))
         print("Slot F1 score for epoch {}: {}".format(epoch, f1_for_sequence_batch(true_slots_a, pred_slots_a)))
 
-# def test_data():
-#     # train_data = open("dataset/atis-2.train.w-intent.iob", "r").readlines()
-#     # test_data = open("dataset/atis-2.dev.w-intent.iob", "r").readlines()
-#     train_data_ed = data_pipeline(train_data, input_steps)
-#     test_data_ed = data_pipeline(test_data, input_steps)
-#     word2index, index2word, slot2index, index2slot, intent2index, index2intent = \
-#         get_info_from_training_data(train_data_ed)
-#     # print("slot2index: ", slot2index)
-#     # print("index2slot: ", index2slot)
-#     index_train = to_index(train_data_ed, word2index, slot2index, intent2index)
-#     index_test = to_index(test_data_ed, word2index, slot2index, intent2index)
-#     batch = next(getBatch(batch_size, index_test))
-#     unziped = list(zip(*batch))
-#     print("word num: ", len(word2index.keys()), "slot num: ", len(slot2index.keys()), "intent num: ",
-#           len(intent2index.keys()))
-#     print(np.shape(unziped[0]), np.shape(unziped[1]), np.shape(unziped[2]), np.shape(unziped[3]))
-#     print(np.transpose(unziped[0], [1, 0]))
-#     print(unziped[1])
-#     print(np.shape(list(zip(*index_test))[2]))
 
 
 if __name__ == '__main__':
-    # train(is_debug=True)
-    # test_data()
     train()

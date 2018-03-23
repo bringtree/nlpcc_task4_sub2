@@ -39,8 +39,9 @@ class Model:
         # Encoder
 
         # 使用单个LSTM cell
-        encoder_f_cell_0 = LSTMCell(self.hidden_size)
-        encoder_b_cell_0 = LSTMCell(self.hidden_size)
+        encoder_f_cell_0 = LSTMCell(self.hidden_size, initializer=tf.orthogonal_initializer())
+        encoder_b_cell_0 = LSTMCell(self.hidden_size, initializer=tf.orthogonal_initializer())
+        # output_keep_prob :if it is constant and 1, no output dropout will be added.
         encoder_f_cell = DropoutWrapper(encoder_f_cell_0, output_keep_prob=0.5)
         encoder_b_cell = DropoutWrapper(encoder_b_cell_0, output_keep_prob=0.5)
         # encoder_inputs_time_major = tf.transpose(self.encoder_inputs_embedded, perm=[1, 0, 2])
@@ -76,19 +77,9 @@ class Model:
         print("encoder_outputs[0]: ", encoder_outputs[0])
         print("encoder_final_state_c: ", encoder_final_state_c)
 
-        # Decoder
-
-        decoder_lengths = self.encoder_inputs_actual_length
-
-        self.slot_W = tf.Variable(tf.random_uniform([self.hidden_size * 2, self.slot_size], -1, 1),
-                                  dtype=tf.float32, name="slot_W")
-
-        self.slot_b = tf.Variable(tf.zeros([self.slot_size]), dtype=tf.float32, name="slot_b")
-
         intent_W = tf.Variable(tf.random_uniform([self.hidden_size * 2, self.intent_size], -0.1, 0.1),
                                dtype=tf.float32, name="intent_W")
         intent_b = tf.Variable(tf.zeros([self.intent_size]), dtype=tf.float32, name="intent_b")
-
 
         # 这块是intent的检测 它只是用的encoder的那块部分
         # 求intent [句子数量,cell_num*2(concat)] + intene_W(cell_num*2,intent_size) + b
@@ -96,6 +87,14 @@ class Model:
         # intent_prob = tf.nn.softmax(intent_logits)
         self.intent = tf.argmax(intent_logits, axis=1)
 
+        # Decoder
+
+        decoder_lengths = self.encoder_inputs_actual_length
+
+        # 这块开始就出现helper的代码了 完全是迷
+        # self.slot_W = tf.Variable(tf.random_uniform([self.hidden_size * 2, self.slot_size], -1, 1),
+        #                           dtype=tf.float32, name="slot_W")
+        # self.slot_b = tf.Variable(tf.zeros([self.slot_size]), dtype=tf.float32, name="slot_b")
         sos_time_slice = tf.ones([self.batch_size], dtype=tf.int32, name='SOS') * 2
         sos_step_embedded = tf.nn.embedding_lookup(self.embeddings, sos_time_slice)
         # pad_time_slice = tf.zeros([self.batch_size], dtype=tf.int32, name='PAD')
@@ -114,6 +113,13 @@ class Model:
             # output_logits = tf.add(tf.matmul(outputs, self.slot_W), self.slot_b)
             # print("slot output_logits: ", output_logits)
             # prediction_id = tf.argmax(output_logits, axis=1)
+            #
+            # argmax 返回最大值的 x参数
+            # array([[1, 2, 3, 4],
+            #        [5, 6, 7, 8]])
+            # >> > e = tf.argmax(a, 1)
+            # >> > sess.run(e)
+            # array([3, 3])
             prediction_id = tf.to_int32(tf.argmax(outputs, axis=1))
             return prediction_id
 
@@ -139,7 +145,7 @@ class Model:
                 attention_mechanism = tf.contrib.seq2seq.BahdanauAttention(
                     num_units=self.hidden_size, memory=memory,
                     memory_sequence_length=self.encoder_inputs_actual_length)
-                cell = tf.contrib.rnn.LSTMCell(num_units=self.hidden_size * 2)
+                cell = tf.contrib.rnn.LSTMCell(num_units=self.hidden_size * 2, initializer=tf.orthogonal_initializer())
 
                 # 注意力包装器 需要 cell 和 注意力机制
                 attn_cell = tf.contrib.seq2seq.AttentionWrapper(
@@ -169,6 +175,7 @@ class Model:
         print("outputs.rnn_output: ", outputs.rnn_output)
         print("outputs.sample_id: ", outputs.sample_id)
         # weights = tf.to_float(tf.not_equal(outputs[:, :-1], 0))
+        # 这个就是 槽输出
         self.decoder_prediction = outputs.sample_id
         # max_step对应的是slot输出 batch_size 是句子 dim是输出
         decoder_max_steps, decoder_batch_size, decoder_dim = tf.unstack(tf.shape(outputs.rnn_output))
@@ -203,25 +210,16 @@ class Model:
         #     learning_rate=0.001,
         #     summaries=['loss', 'learning_rate'])
 
-    def step(self, sess, mode, trarin_batch):
+    def step(self, sess, trarin_batch):
         """ perform each batch"""
-        if mode not in ['train', 'test']:
-            print(sys.stderr, 'mode is not supported')
-            sys.exit(1)
-        unziped = list(zip(*trarin_batch))
-        # print(np.shape(unziped[0]), np.shape(unziped[1]),
-        #       np.shape(unziped[2]), np.shape(unziped[3]))
-        if mode == 'train':
-            output_feeds = [self.train_op, self.loss, self.decoder_prediction,
-                            self.intent, self.mask, self.slot_W]
-            feed_dict = {self.encoder_inputs: np.transpose(unziped[0], [1, 0]),
-                         self.encoder_inputs_actual_length: unziped[1],
-                         self.decoder_targets: unziped[2],
-                         self.intent_targets: unziped[3]}
-        if mode in ['test']:
-            output_feeds = [self.decoder_prediction, self.intent]
-            feed_dict = {self.encoder_inputs: np.transpose(unziped[0], [1, 0]),
-                         self.encoder_inputs_actual_length: unziped[1]}
 
+        unziped = list(zip(*trarin_batch))
+
+        output_feeds = [self.train_op, self.loss, self.decoder_prediction,
+                        self.intent, self.mask]
+        feed_dict = {self.encoder_inputs: np.transpose(unziped[0], [1, 0]),
+                     self.encoder_inputs_actual_length: unziped[1],
+                     self.decoder_targets: unziped[2],
+                     self.intent_targets: unziped[3]}
         results = sess.run(output_feeds, feed_dict=feed_dict)
         return results
