@@ -92,7 +92,7 @@ def train(is_debug=False):
         train_loss = 0.0
         for i, batch in enumerate(getBatch(batch_size, index_train)):
             # 执行一个batch的训练
-            _, loss, decoder_prediction, intent, mask, ms = model.step(sess, batch, merged_summary)
+            _, loss, decoder_prediction, intent, mask = model.step(sess, batch)
             mean_loss += loss
             train_loss += loss
             if i % 10 == 0:
@@ -103,14 +103,15 @@ def train(is_debug=False):
 
         train_loss /= (i + 1)
         print("[Epoch {}] Average train loss: {}".format(epoch, train_loss))
+
         # 每训一个epoch，测试一次
         pred_slots = []
         slot_accs = []
         intent_accs = []
         for j, batch in enumerate(getBatch(batch_size, index_test)):
 
-            _, loss, decoder_prediction, intent, mask, result_board = model.step(sess, batch, merged_summary)
-            writer.add_summary(result_board, epoch)
+            _, loss, decoder_prediction, intent, mask = model.step(sess, batch)
+            # writer.add_summary(result_board, epoch)
 
             decoder_prediction = np.transpose(decoder_prediction, [1, 0])
             if j == 0:
@@ -141,8 +142,13 @@ def train(is_debug=False):
         # print("pred_slots_a: ", pred_slots_a.shape)
         true_slots_a = np.array(list(zip(*index_test))[2])[:pred_slots_a.shape[0]]
         # print("true_slots_a: ", true_slots_a.shape)
-        print("Intent accuracy for epoch {}: {}".format(epoch, np.average(intent_accs)))
-        print("Slot accuracy for epoch {}: {}".format(epoch, np.average(slot_accs)))
+        # accuracy = tf.reduce_mean(tf.cast(correct_prediction, "float"))
+
+        intent_accuracy, slot_accuracy, result_board = model.get_score(sess, intent_accs, slot_accs, merged_summary)
+        writer.add_summary(result_board, epoch)
+
+        print("Intent accuracy for epoch {}: {}".format(epoch, intent_accuracy))
+        print("Slot accuracy for epoch {}: {}".format(epoch, slot_accuracy))
         print("Slot F1 score for epoch {}: {}".format(epoch, f1_for_sequence_batch(true_slots_a, pred_slots_a)))
 
 

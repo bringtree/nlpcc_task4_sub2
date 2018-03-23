@@ -195,9 +195,9 @@ class Model:
 
             # 我觉得 其实应该把2个loss 分出来 单独训练 或者加权？猜测 前期intent正确率不行 后期slot 不行
             self.loss = loss_slot + loss_intent
-            tf.summary.scalar('loss_slot', loss_slot)
-            tf.summary.scalar('loss_intent', loss_intent)
-            tf.summary.scalar('all_loss', self.loss)
+            # tf.summary.scalar('loss_slot', loss_slot)
+            # tf.summary.scalar('loss_intent', loss_intent)
+            # tf.summary.scalar('all_loss', self.loss)
 
         with tf.name_scope("optimizer_function"):
             optimizer = tf.train.AdamOptimizer(name="a_optimizer", learning_rate=0.001)
@@ -212,16 +212,32 @@ class Model:
         #     learning_rate=0.001,
         #     summaries=['loss', 'learning_rate'])
 
-    def step(self, sess, trarin_batch, merged_summary):
+        with tf.name_scope("accuracy"):
+            self.intent_accs_placeholder = tf.placeholder(shape=[None], dtype=tf.float32)
+            self.slot_accs_placeholder = tf.placeholder(shape=[None], dtype=tf.float32)
+            self.intent_accs_op = tf.reduce_mean(self.intent_accs_placeholder)
+            self.slot_accs_op = tf.reduce_mean(self.slot_accs_placeholder)
+            tf.summary.scalar("intent_acc", self.intent_accs_op)
+            tf.summary.scalar("slot_acc", self.slot_accs_op)
+
+    def step(self, sess, trarin_batch):
         """ perform each batch"""
 
         unziped = list(zip(*trarin_batch))
 
         output_feeds = [self.train_op, self.loss, self.decoder_prediction,
-                        self.intent, self.mask, merged_summary]
+                        self.intent, self.mask]
         feed_dict = {self.encoder_inputs: np.transpose(unziped[0], [1, 0]),
                      self.encoder_inputs_actual_length: unziped[1],
                      self.decoder_targets: unziped[2],
                      self.intent_targets: unziped[3]}
         results = sess.run(output_feeds, feed_dict=feed_dict)
+        return results
+
+    def get_score(self, sess, intent_accs, slot_accs, merged_summary):
+        results = sess.run([self.intent_accs_op, self.slot_accs_op, merged_summary],
+                           feed_dict={
+                               self.intent_accs_placeholder: intent_accs,
+                               self.slot_accs_placeholder: slot_accs
+                           })
         return results
