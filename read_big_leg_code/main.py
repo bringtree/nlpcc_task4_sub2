@@ -26,7 +26,7 @@ sentences = [v[1:v.index("EOS")] for v in raw_data]
 slot_sentences = [v[v.index("EOS") + 2:-1] for v in raw_data]
 labels = [v[-1].replace('\n', '') for v in raw_data]
 
-train_X, train_slot_sentences, train_Y, test_X, test_slot_sentences, test_Y = k_fold(5, X=sentences, Y=labels,
+train_X, train_slot_sentences, train_Y, test_X, test_slot_sentences, test_Y = k_fold(2, X=sentences, Y=labels,
                                                                                      slot_sentences=slot_sentences)
 
 train_data = []
@@ -74,10 +74,8 @@ def train(is_debug=False):
         get_info_from_training_data(train_data_ed)
     # print("slot2index: ", slot2index)
     # print("index2slot: ", index2slot)
-    print("run ")
     index_train = to_index(train_data_ed, word2index, slot2index, intent2index)
     index_test = to_index(test_data_ed, word2index, slot2index, intent2index)
-    print("run ")
     for epoch in range(epoch_num):
         mean_loss = 0.0
         train_loss = 0.0
@@ -115,7 +113,9 @@ def train(is_debug=False):
         slot_accs = []
         intent_accs = []
         for j, batch in enumerate(getBatch(batch_size, index_test)):
-            loss,decoder_prediction, intent,mask,slot_W = model.step(sess, "train", batch)
+
+            _, loss, decoder_prediction, intent, mask, slot_W = model.step(sess, 'train', batch)
+
             decoder_prediction = np.transpose(decoder_prediction, [1, 0])
             if j == 0:
                 index = random.choice(range(len(batch)))
@@ -148,7 +148,6 @@ def train(is_debug=False):
         print("Intent accuracy for epoch {}: {}".format(epoch, np.average(intent_accs)))
         print("Slot accuracy for epoch {}: {}".format(epoch, np.average(slot_accs)))
         print("Slot F1 score for epoch {}: {}".format(epoch, f1_for_sequence_batch(true_slots_a, pred_slots_a)))
-
 
 # def test_data():
 #     # train_data = open("dataset/atis-2.train.w-intent.iob", "r").readlines()
