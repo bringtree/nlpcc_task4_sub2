@@ -19,7 +19,7 @@ intent_size = 11
 epoch_num = 50
 
 # 这块到时候替换掉 ~~~~~~~~~~~~~~~~
-with open("test_data.txt") as fp:
+with open("/Users/huangpeisong/Desktop/task-slu-tencent.dingdang/rnn/read_big_leg_code/test_data.txt") as fp:
     raw_data = [v.split(' ') for v in fp.readlines()]
 
 sentences = [v[1:v.index("EOS")] for v in raw_data]
@@ -70,10 +70,14 @@ def train(is_debug=False):
 
     train_data_ed = data_pipeline(train_data, length=input_steps)
     test_data_ed = data_pipeline(test_data, length=input_steps)
+    # 生成6份字典 分别是 句子中的词 -> 序号  序号-> 句子中的词   (slot intent 同理)
     word2index, index2word, slot2index, index2slot, intent2index, index2intent = \
         get_info_from_training_data(train_data_ed)
     # print("slot2index: ", slot2index)
     # print("index2slot: ", index2slot)
+    # 接下来 完成 编码
+    # index_train = train_data_ed
+    # index_test = test_data_ed
     index_train = to_index(train_data_ed, word2index, slot2index, intent2index)
     index_test = to_index(test_data_ed, word2index, slot2index, intent2index)
     for epoch in range(epoch_num):
@@ -82,29 +86,29 @@ def train(is_debug=False):
         for i, batch in enumerate(getBatch(batch_size, index_train)):
             # 执行一个batch的训练
             _, loss, decoder_prediction, intent, mask, slot_W = model.step(sess, "train", batch)
-            # if i == 0:
-            #     index = 0
-            #     print("training debug:")
-            #     print("input:", list(zip(*batch))[0][index])
-            #     print("length:", list(zip(*batch))[1][index])
-            #     print("mask:", mask[index])
-            #     print("target:", list(zip(*batch))[2][index])
-            #     # print("decoder_targets_one_hot:")
-            #     # for one in decoder_targets_one_hot[index]:
-            #     #     print(" ".join(map(str, one)))
-            #     print("decoder_logits: ")
-            #     for one in decoder_logits[index]:
-            #         print(" ".join(map(str, one)))
-            #     print("slot_W:", slot_W)
-            #     print("decoder_prediction:", decoder_prediction[index])
-            #     print("intent:", list(zip(*batch))[3][index])
-            # mean_loss += loss
-            # train_loss += loss
-            # if i % 10 == 0:
-            #     if i > 0:
-            #         mean_loss = mean_loss / 10.0
-            #     print('Average train loss at epoch %d, step %d: %f' % (epoch, i, mean_loss))
-            #     mean_loss = 0
+            if i == 0:
+                index = 0
+                print("training debug:")
+                print("input:", list(zip(*batch))[0][index])
+                print("length:", list(zip(*batch))[1][index])
+                print("mask:", mask[index])
+                print("target:", list(zip(*batch))[2][index])
+                # print("decoder_targets_one_hot:")
+                # for one in decoder_targets_one_hot[index]:
+                #     print(" ".join(map(str, one)))
+                print("decoder_logits: ")
+                # for one in decoder_logits[index]:
+                #     print(" ".join(map(str, one)))
+                print("slot_W:", slot_W)
+                print("decoder_prediction:", decoder_prediction[index])
+                print("intent:", list(zip(*batch))[3][index])
+            mean_loss += loss
+            train_loss += loss
+            if i % 10 == 0:
+                if i > 0:
+                    mean_loss = mean_loss / 10.0
+                print('Average train loss at epoch %d, step %d: %f' % (epoch, i, mean_loss))
+                mean_loss = 0
         train_loss /= (i + 1)
         print("[Epoch {}] Average train loss: {}".format(epoch, train_loss))
 

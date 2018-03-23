@@ -42,25 +42,26 @@ def data_pipeline(data, length=50):
         data = list(zip(sin, sout, intent))
     return data
 
-
+# 做一个字典
 def get_info_from_training_data(data):
     seq_in, seq_out, intent = list(zip(*data))
     vocab = set(flatten(seq_in))
     slot_tag = set(flatten(seq_out))
     intent_tag = set(intent)
-    # 生成word2index
+    # 生成word2index 句子字典
     word2index = {'<PAD>': 0, '<UNK>': 1, '<SOS>': 2, '<EOS>': 3}
     for token in vocab:
-        if token not in word2index.keys():
+        if token not in word2index:
             word2index[token] = len(word2index)
 
+    # 字典key value 翻转过来
     # 生成index2word
     index2word = {v: k for k, v in word2index.items()}
 
-    # 生成tag2index
+    # 生成tag2index 槽字典
     tag2index = {'<PAD>': 0, '<UNK>': 1, "O": 2}
     for tag in slot_tag:
-        if tag not in tag2index.keys():
+        if tag not in tag2index:
             tag2index[tag] = len(tag2index)
 
     # 生成index2tag
@@ -69,7 +70,7 @@ def get_info_from_training_data(data):
     # 生成intent2index
     intent2index = {'<UNK>': 0}
     for ii in intent_tag:
-        if ii not in intent2index.keys():
+        if ii not in intent2index:
             intent2index[ii] = len(intent2index)
 
     # 生成index2intent

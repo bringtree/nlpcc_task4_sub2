@@ -25,6 +25,7 @@ class Model:
                                                            name='encoder_inputs_actual_length')
         self.decoder_targets = tf.placeholder(tf.int32, [batch_size, input_steps],
                                               name='decoder_targets')
+        # 真实的intent输入
         self.intent_targets = tf.placeholder(tf.int32, [batch_size],
                                              name='intent_targets')
 
@@ -88,6 +89,8 @@ class Model:
                                dtype=tf.float32, name="intent_W")
         intent_b = tf.Variable(tf.zeros([self.intent_size]), dtype=tf.float32, name="intent_b")
 
+
+        # 这块是intent的检测 它只是用的encoder的那块部分
         # 求intent [句子数量,cell_num*2(concat)] + intene_W(cell_num*2,intent_size) + b
         intent_logits = tf.add(tf.matmul(encoder_final_state_h, intent_W), intent_b)
         # intent_prob = tf.nn.softmax(intent_logits)
@@ -178,7 +181,7 @@ class Model:
         loss_slot = tf.contrib.seq2seq.sequence_loss(
             outputs.rnn_output, self.decoder_targets_true_length, weights=self.mask)
         # 定义intent分类的损失
-        cross_entropy = tf.nn.softmax_cross_entropy_with_logits(
+        cross_entropy = tf.nn.sigmoid_cross_entropy_with_logits(
             labels=tf.one_hot(self.intent_targets, depth=self.intent_size, dtype=tf.float32),
             logits=intent_logits)
         loss_intent = tf.reduce_mean(cross_entropy)
@@ -199,7 +202,7 @@ class Model:
     def step(self, sess, mode, trarin_batch):
         """ perform each batch"""
         if mode not in ['train', 'test']:
-            print >> sys.stderr, 'mode is not supported'
+            print(sys.stderr, 'mode is not supported')
             sys.exit(1)
         unziped = list(zip(*trarin_batch))
         # print(np.shape(unziped[0]), np.shape(unziped[1]),
