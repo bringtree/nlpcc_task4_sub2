@@ -175,17 +175,21 @@ class Model:
         self.decoder_targets_time_majored = tf.transpose(self.decoder_targets, [1, 0])
         self.decoder_targets_true_length = self.decoder_targets_time_majored[:decoder_max_steps]
         print("decoder_targets_true_length: ", self.decoder_targets_true_length)
+
         # 定义mask，使padding不计入loss计算
         self.mask = tf.to_float(tf.not_equal(self.decoder_targets_true_length, 0))
         # 定义slot标注的损失
         loss_slot = tf.contrib.seq2seq.sequence_loss(
             outputs.rnn_output, self.decoder_targets_true_length, weights=self.mask)
+
         # 定义intent分类的损失
+        # 我把损失函数换成了 sigmoid 原来是softmax 可以比较下
         cross_entropy = tf.nn.sigmoid_cross_entropy_with_logits(
             labels=tf.one_hot(self.intent_targets, depth=self.intent_size, dtype=tf.float32),
             logits=intent_logits)
         loss_intent = tf.reduce_mean(cross_entropy)
 
+        # 我觉得 其实应该把2个loss 分出来 单独训练 或者加权？猜测 前期intent正确率不行 后期slot 不行
         self.loss = loss_slot + loss_intent
         optimizer = tf.train.AdamOptimizer(name="a_optimizer")
         self.grads, self.vars = zip(*optimizer.compute_gradients(self.loss))

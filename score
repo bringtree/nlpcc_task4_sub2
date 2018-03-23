@@ -1,0 +1,9 @@
+[Epoch 49] Average train loss: 0.0
+Input Sentence        :  ['播放', '一首', '<UNK>']
+Slot Truth            :  ['O', 'O', 'song']
+Slot Prediction       :  ['O', 'O', 'song']
+Intent Truth          :  music.play
+Intent Prediction     :  music.play
+Intent accuracy for epoch 49: 0.8930722891566265
+Slot accuracy for epoch 49: 0.9556496859276778
+Slot F1 score for epoch 49: 0.9574977973568282
