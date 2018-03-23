@@ -8,13 +8,25 @@ from tensorflow.python import debug as tf_debug
 import numpy as np
 from data_utils import k_fold
 
+
 input_steps = 30
-embedding_size = 100
-hidden_size = 100
-batch_size = 64
-# 这个vocab_size 到时候 会直接就换成 那个很大很大的词向量来处理
+
+# 换成词向量的
 vocab_size = 12021
+embedding_size = 100
+############
+
+# lstm 隐藏层单元参数的大小
+hidden_size = 100
+
+# 一个batch输入的64个句子
+batch_size = 64
+
+# 这个vocab_size 到时候 会直接就换成 那个很大很大的词向量来处理
+# lstm输出的槽值大小
 slot_size = 30
+
+# 迭代多少次
 epoch_num = 50
 
 # 这块到时候替换掉 ~~~~~~~~~~~~~~~~
