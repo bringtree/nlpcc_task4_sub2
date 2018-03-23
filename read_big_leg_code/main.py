@@ -8,7 +8,6 @@ from tensorflow.python import debug as tf_debug
 import numpy as np
 from data_utils import k_fold
 
-
 input_steps = 30
 
 # 换成词向量的
@@ -36,7 +35,7 @@ with open("/Users/huangpeisong/Desktop/task-slu-tencent.dingdang/rnn/read_big_le
 sentences = [v[1:v.index("EOS")] for v in raw_data]
 slot_sentences = [v[v.index("EOS") + 2:-1] for v in raw_data]
 labels = [v[-1].replace('\n', '') for v in raw_data]
-train_X, train_slot_sentences, train_Y, test_X, test_slot_sentences, test_Y = k_fold(10, X=sentences, Y=labels,
+train_X, train_slot_sentences, train_Y, test_X, test_slot_sentences, test_Y = k_fold(2, X=sentences, Y=labels,
                                                                                      slot_sentences=slot_sentences)
 
 train_data = []
@@ -69,6 +68,7 @@ intent_size = len(intent2index)
 index_train = to_index(train_data_ed, word2index, slot2index, intent2index)
 index_test = to_index(test_data_ed, word2index, slot2index, intent2index)
 
+
 def get_model():
     model = Model(input_steps, embedding_size, hidden_size, vocab_size, slot_size,
                   intent_size, epoch_num, batch_size)
@@ -79,17 +79,20 @@ def get_model():
 def train(is_debug=False):
     model = get_model()
     sess = tf.Session()
-    if is_debug:
-        sess = tf_debug.LocalCLIDebugWrapperSession(sess)
-        sess.add_tensor_filter("has_inf_or_nan", tf_debug.has_inf_or_nan)
+    writer = tf.summary.FileWriter("./model")
+    writer.add_graph(sess.graph)
+    # if is_debug:
+    #     sess = tf_debug.LocalCLIDebugWrapperSession(sess)
+    #     sess.add_tensor_filter("has_inf_or_nan", tf_debug.has_inf_or_nan)
     sess.run(tf.global_variables_initializer())
+    merged_summary = tf.summary.merge_all()
 
     for epoch in range(epoch_num):
         mean_loss = 0.0
         train_loss = 0.0
         for i, batch in enumerate(getBatch(batch_size, index_train)):
             # 执行一个batch的训练
-            _, loss, decoder_prediction, intent, mask = model.step(sess, batch)
+            _, loss, decoder_prediction, intent, mask, ms = model.step(sess, batch, merged_summary)
             mean_loss += loss
             train_loss += loss
             if i % 10 == 0:
@@ -100,14 +103,14 @@ def train(is_debug=False):
 
         train_loss /= (i + 1)
         print("[Epoch {}] Average train loss: {}".format(epoch, train_loss))
-
         # 每训一个epoch，测试一次
         pred_slots = []
         slot_accs = []
         intent_accs = []
         for j, batch in enumerate(getBatch(batch_size, index_test)):
 
-            _, loss, decoder_prediction, intent, mask = model.step(sess, batch)
+            _, loss, decoder_prediction, intent, mask, result_board = model.step(sess, batch, merged_summary)
+            writer.add_summary(result_board, epoch)
 
             decoder_prediction = np.transpose(decoder_prediction, [1, 0])
             if j == 0:
@@ -141,7 +144,6 @@ def train(is_debug=False):
         print("Intent accuracy for epoch {}: {}".format(epoch, np.average(intent_accs)))
         print("Slot accuracy for epoch {}: {}".format(epoch, np.average(slot_accs)))
         print("Slot F1 score for epoch {}: {}".format(epoch, f1_for_sequence_batch(true_slots_a, pred_slots_a)))
-
 
 
 if __name__ == '__main__':
