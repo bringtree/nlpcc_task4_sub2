@@ -47,7 +47,8 @@ def get_info_from_training_data(data,test_data):
     seq_in, seq_out, intent = list(zip(*data))
     test_seq_in, test_seq_out, test_intent = list(zip(*test_data))
     vocab = set(flatten(seq_in))
-    vocab |= set(test_seq_in)
+    tmp_cab = set(vocab)
+    vocab |= set(tmp_cab)
     slot_tag = set(flatten(seq_out))
     intent_tag = set(intent)
     # 生成word2index 句子字典

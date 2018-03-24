@@ -12,7 +12,6 @@ import os
 
 pwd = os.getcwd()
 input_steps = 30
-vocab_size = 12021
 embedding_size = 300
 # lstm 隐藏层单元参数的大小
 hidden_size = 100
@@ -59,7 +58,7 @@ test_data_ed = data_pipeline(test_data, length=input_steps)
 word2index, index2word, slot2index, index2slot, intent2index, index2intent = \
     get_info_from_training_data(train_data_ed,test_data_ed)
 intent_size = len(intent2index)
-
+vocab_size = len(word2index)
 # 接下来 完成 编码
 index_train = to_index(train_data_ed, word2index, slot2index, intent2index)
 index_test = to_index(test_data_ed, word2index, slot2index, intent2index)
