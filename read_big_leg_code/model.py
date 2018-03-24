@@ -172,12 +172,8 @@ class Model:
             )
             outputs = final_outputs
 
-        # print("outputs: ", outputs)
-        # print("outputs.rnn_output: ", outputs.rnn_output)
-        # print("outputs.sample_id: ", outputs.sample_id)
-        # weights = tf.to_float(tf.not_equal(outputs[:, :-1], 0))
-        # 这个就是 槽输出
 
+        # 这个就是 槽输出
         self.decoder_prediction = outputs.sample_id
         # max_step对应的是slot输出 batch_size 是句子 dim是输出
         decoder_max_steps, decoder_batch_size, decoder_dim = tf.unstack(tf.shape(outputs.rnn_output))
@@ -211,12 +207,6 @@ class Model:
             # print("vars for loss function: ", self.vars)
             self.gradients, _ = tf.clip_by_global_norm(self.grads, 5)  # clip gradients
             self.train_op = optimizer.apply_gradients(zip(self.gradients, self.vars))
-        # self.train_op = optimizer.minimize(self.loss)
-        # train_op = layers.optimize_loss(
-        #     loss, tf.train.get_global_step(),
-        #     optimizer=optimizer,
-        #     learning_rate=0.001,
-        #     summaries=['loss', 'learning_rate'])
 
         with tf.name_scope("accuracy"):
             self.intent_accs_placeholder = tf.placeholder(shape=[None], dtype=tf.float32)

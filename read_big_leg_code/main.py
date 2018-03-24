@@ -11,27 +11,18 @@ import fastText as fasttext
 import os
 
 pwd = os.getcwd()
-
 input_steps = 30
-
-# 换成词向量的
 vocab_size = 12021
-embedding_size = 100
-############
-
+embedding_size = 300
 # lstm 隐藏层单元参数的大小
 hidden_size = 100
-
 # 一个batch输入的64个句子
 batch_size = 64
-
 # 这个vocab_size 到时候 会直接就换成 那个很大很大的词向量来处理
 # lstm输出的槽值大小
 slot_size = 30
-
 # 迭代多少次
 epoch_num = 100
-
 enable_w2v = True
 
 # 这块到时候替换掉 ~~~~~~~~~~~~~~~~
@@ -41,8 +32,7 @@ with open("/Users/huangpeisong/Desktop/task-slu-tencent.dingdang/rnn/read_big_le
 sentences = [v[1:v.index("EOS")] for v in raw_data]
 slot_sentences = [v[v.index("EOS") + 2:-1] for v in raw_data]
 labels = [v[-1].replace('\n', '') for v in raw_data]
-train_X, train_slot_sentences, train_Y, test_X, test_slot_sentences, test_Y = k_fold(2, X=sentences, Y=labels,
-                                                                                     slot_sentences=slot_sentences)
+train_X, train_slot_sentences, train_Y, test_X, test_slot_sentences, test_Y = k_fold(2, X=sentences, Y=labels, slot_sentences=slot_sentences)
 
 train_data = []
 for idx in range(len(train_X[0])):
@@ -59,15 +49,15 @@ for idx in range(len(test_X[0])):
     tmp.append(test_slot_sentences[0][idx])
     tmp.append(test_Y[0][idx])
     test_data.append(tmp)
-
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 train_data_ed = data_pipeline(train_data, length=input_steps)
 test_data_ed = data_pipeline(test_data, length=input_steps)
 
 # 生成6份字典 分别是 句子中的词 -> 序号  序号-> 句子中的词   (slot intent 同理)
+# 这里加入测试集 只是为了 给测试集的句子中的词 也有一个编号而已
 word2index, index2word, slot2index, index2slot, intent2index, index2intent = \
-    get_info_from_training_data(train_data_ed)
+    get_info_from_training_data(train_data_ed,test_data_ed)
 intent_size = len(intent2index)
 
 # 接下来 完成 编码
@@ -78,8 +68,8 @@ index_test = to_index(test_data_ed, word2index, slot2index, intent2index)
 if enable_w2v is True:
     w2v_model_bin = "/home/bringtree/data/wiki.zh.bin"
     w2v_model = fasttext.load_model(w2v_model_bin)
-    embedding_W = []
-    for key, value in word2index:
+    embedding_W = np.eye(vocab_size, embedding_size)
+    for key, value in word2index.items():
         embedding_W[value] = w2v_model.get_word_vector(key)
 else:
     embedding_W = None

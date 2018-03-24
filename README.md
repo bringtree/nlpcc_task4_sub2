@@ -17,4 +17,15 @@
 https://github.com/applenob/RNN-for-Joint-NLU/issues/6
 
 记录一个bug
-还没有做
+#还没有做
+1 k折部分的代码 没做好 以及实现 抽取这块
+
+2 <s>embedding 的替换</s>
+ 
+3 词向量的优化
+  
+4 <s>tensorboard 可视化 模型</s>
+ 
+5 模型参数的选择，以及训练的策略
+
+6 模型保存

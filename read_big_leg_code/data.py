@@ -43,9 +43,11 @@ def data_pipeline(data, length=50):
     return data
 
 # 做一个字典
-def get_info_from_training_data(data):
+def get_info_from_training_data(data,test_data):
     seq_in, seq_out, intent = list(zip(*data))
+    test_seq_in, test_seq_out, test_intent = list(zip(*test_data))
     vocab = set(flatten(seq_in))
+    vocab |= set(test_seq_in)
     slot_tag = set(flatten(seq_out))
     intent_tag = set(intent)
     # 生成word2index 句子字典
