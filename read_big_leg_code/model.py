@@ -9,7 +9,7 @@ import sys
 
 class Model:
     def __init__(self, input_steps, embedding_size, hidden_size, vocab_size, slot_size,
-                 intent_size, epoch_num, batch_size=16):
+                 intent_size, epoch_num, batch_size=16, embedding_w=None):
         self.input_steps = input_steps
         self.embedding_size = embedding_size
         self.hidden_size = hidden_size
@@ -18,7 +18,11 @@ class Model:
         self.slot_size = slot_size
         self.intent_size = intent_size
         self.epoch_num = epoch_num
-
+        if embedding_w is None:
+            tf.random_uniform([self.vocab_size, self.embedding_size],
+                              -0.1, 0.1)
+        else:
+            self.embedding_W = embedding_w
         # 每句输入的实际长度，除了padding
         self.encoder_inputs_actual_length = tf.placeholder(tf.int32, [batch_size],
                                                            name='encoder_inputs_actual_length')
@@ -32,9 +36,11 @@ class Model:
         with tf.name_scope('embedding_layer'):
             self.encoder_inputs = tf.placeholder(tf.int32, [self.input_steps, self.batch_size],
                                                  name='encoder_inputs')
-            self.embeddings = tf.Variable(tf.random_uniform([self.vocab_size, self.embedding_size],
-                                                            -0.1, 0.1), dtype=tf.float32, name="embedding")
+            self.embeddings = tf.Variable(self.embedding_W, dtype=tf.float32, name="embedding")
+
+            # self.embeddings
             self.encoder_inputs_embedded = tf.nn.embedding_lookup(self.embeddings, self.encoder_inputs)
+            # <tf.Tensor 'embedding_layer/embedding_lookup:0' shape=(30, 64, 100) dtype=float32>
 
         with tf.name_scope('encoder_layer'):
             # 使用单个LSTM cell

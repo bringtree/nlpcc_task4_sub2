@@ -7,6 +7,10 @@ from read_big_leg_code.my_metrics import *
 from tensorflow.python import debug as tf_debug
 import numpy as np
 from data_utils import k_fold
+import fastText as fasttext
+import os
+
+pwd = os.getcwd()
 
 input_steps = 30
 
@@ -26,7 +30,9 @@ batch_size = 64
 slot_size = 30
 
 # 迭代多少次
-epoch_num = 50
+epoch_num = 100
+
+enable_w2v = True
 
 # 这块到时候替换掉 ~~~~~~~~~~~~~~~~
 with open("/Users/huangpeisong/Desktop/task-slu-tencent.dingdang/rnn/read_big_leg_code/test_data.txt") as fp:
@@ -68,10 +74,20 @@ intent_size = len(intent2index)
 index_train = to_index(train_data_ed, word2index, slot2index, intent2index)
 index_test = to_index(test_data_ed, word2index, slot2index, intent2index)
 
+# [self.vocab_size, self.embedding_size]
+if enable_w2v is True:
+    w2v_model_bin = "/home/bringtree/data/wiki.zh.bin"
+    w2v_model = fasttext.load_model(w2v_model_bin)
+    embedding_W = []
+    for key, value in word2index:
+        embedding_W[value] = w2v_model.get_word_vector(key)
+else:
+    embedding_W = None
+
 
 def get_model():
     model = Model(input_steps, embedding_size, hidden_size, vocab_size, slot_size,
-                  intent_size, epoch_num, batch_size)
+                  intent_size, epoch_num, batch_size, embedding_W)
     model.build()
     return model
 
