@@ -29,3 +29,7 @@ https://github.com/applenob/RNN-for-Joint-NLU/issues/6
 5 模型参数的选择，以及训练的策略
 
 6 模型保存
+
+7 batch_szie 初代码存在bug 。小于64的不会被放进去 这个要特别注意。
+
+8 代码中的 的字典 存在bug  要导出。 

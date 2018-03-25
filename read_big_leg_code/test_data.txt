@@ -180,3 +180,218 @@ BOS 单田芳 的 作品 EOS O O O O OTHERS
 BOS 封神演义 EOS O O OTHERS
 BOS 打电话 EOS O O phone_call.make_a_phone_call
 BOS 播放歌曲 EOS O O music.play
+BOS 吴楠 EOS O O OTHERS
+BOS 拨打 电话 EOS O O O phone_call.make_a_phone_call
+BOS 他 在 哪里 EOS O O O O OTHERS
+BOS 我要 去 萧山雷迪森大酒店 EOS O O O destination navigation.navigation
+BOS 就 你 烦 我 EOS O O O O O OTHERS
+BOS 拨打 EOS O O phone_call.make_a_phone_call
+BOS 导航 去 公司 EOS O O O custom_destination navigation.navigation
+BOS 您好 您 拨打 的 用户 正忙 不 讲话 啦 大姨 又 不 打电话 EOS O O O O O O O O O O O O O O OTHERS
+BOS 郭旃 EOS O O OTHERS
+BOS 给 的 放手的幸福 EOS O O O song music.play
+BOS 播放 EOS O O music.play
+BOS 请 播放 李玲玉 的 歌 EOS O O O singer O O music.play
+BOS 王楠 EOS O O OTHERS
+BOS 唐宁 的 歌曲 EOS O singer O O music.play
+BOS 不要 了 EOS O O O music.pause
+BOS 取消 导航 EOS O O O navigation.cancel_navigation
+BOS 凤凰传奇 EOS O singer music.play
+BOS 凤凰传奇 EOS O singer music.play
+BOS 安与骑兵 EOS O singer music.play
+BOS 区法院 EOS O destination navigation.navigation
+BOS 导航 EOS O O navigation.open
+BOS 取消 EOS O O navigation.cancel_navigation
+BOS 播放 小跳蛙 EOS O O song music.play
+BOS 小跳蛙 EOS O song music.play
+BOS 我想 听 小跳蛙 EOS O O O O song music.play
+BOS 播放 青蛙乐队 的 歌曲 EOS O O singer O O music.play
+BOS 4 EOS O O OTHERS
+BOS 哲毅 EOS O singer music.play
+BOS 结束 导航 EOS O O O navigation.cancel_navigation
+BOS 取消 EOS O O navigation.cancel_navigation
+BOS 在人间 EOS O song music.play
+BOS 给我 播放 一首 在人间 EOS O O O O O song music.play
+BOS 给我 播放 一首 在人间 EOS O O O O O song music.play
+BOS 给我 播放 一首 在人间 EOS O O O O O song music.play
+BOS 到 泺口服装大厦 EOS O O destination navigation.navigation
+BOS 导航 岔路街 EOS O O destination navigation.navigation
+BOS 返回 主 界面 EOS O O O O OTHERS
+BOS 打电话 给 13200004609 EOS O O O phone_num phone_call.make_a_phone_call
+BOS 胡歌 的 歌 EOS O singer O O music.play
+BOS 一场恋爱 EOS O song music.play
+BOS 一场恋爱 EOS O song music.play
+BOS beyond 的 EOS O singer O music.play
+BOS beyond 的 歌曲 EOS O singer O O music.play
+BOS 播放 梁静茹 EOS O O singer music.play
+BOS 放 一首 EOS O O O music.play
+BOS 播放 彭佳慧 EOS O O singer music.play
+BOS 导航 去 佳木斯文山 EOS O O O destination navigation.navigation
+BOS 去 佳木斯火车站 EOS O O destination navigation.navigation
+BOS 打开 电子眼 EOS O O O OTHERS
+BOS 打开 雷达 测速 EOS O O O O OTHERS
+BOS 雷达 测速 EOS O O O OTHERS
+BOS 打开 行车 记录仪 EOS O O O O OTHERS
+BOS 打开 行车 记录仪 后 车厢 EOS O O O O O O OTHERS
+BOS 打开 导航 EOS O O O navigation.open
+BOS 打电话 给 661 EOS O O O phone_num phone_call.make_a_phone_call
+BOS 那个 帽子 打电话 呢 EOS O O O O O OTHERS
+BOS 导航 到 锦江之星 EOS O O O destination navigation.navigation
+BOS 导航 到 锦江之星品尚 EOS O O O destination navigation.navigation
+BOS 导航 去 大山路和临西十一路 EOS O O O destination navigation.navigation
+BOS 打电话 给 13300005579 EOS O O O phone_num phone_call.make_a_phone_call
+BOS 文博宫 EOS O destination navigation.navigation
+BOS 结束 导航 EOS O O O navigation.cancel_navigation
+BOS 播放 音乐 EOS O O O music.play
+BOS 打电话 给 667 EOS O O O phone_num phone_call.make_a_phone_call
+BOS 导航 到 南岭 EOS O O O destination navigation.navigation
+BOS 导航 到 南梁农场 EOS O O O destination navigation.navigation
+BOS 拨号 670243 EOS O O phone_num phone_call.make_a_phone_call
+BOS 播放 爱江山更爱美人 EOS O O song music.play
+BOS 播放 月半小夜曲 EOS O O song music.play
+BOS 播放 陈乐基 EOS O O singer music.play
+BOS 播放 等一分钟 EOS O O song music.play
+BOS 打电话 给 5000010 EOS O O O phone_num phone_call.make_a_phone_call
+BOS 我 没 叫 你 会 说 EOS O O O O O O O OTHERS
+BOS 此店 镇政府 还要 自己 打车 忘 拿 包包 了 拜拜 这么 多人 EOS O O O O O O O O O O O O O OTHERS
+BOS 池店镇政府 EOS O destination navigation.navigation
+BOS 请导 清盛大道 EOS O O destination navigation.navigation
+BOS 请 播放 音乐 EOS O O O O music.play
+BOS 你 打电话 就是 发给 我 他们 讲 唔 掂 EOS O O O O O O O O O O OTHERS
+BOS 打电话 来 EOS O O O phone_call.make_a_phone_call
+BOS 叮当 你好 EOS O O O OTHERS
+BOS 导航 去 鲁能生态区酒店 EOS O O O destination navigation.navigation
+BOS 米蓝 EOS O O O OTHERS
+BOS 你 弄得好 EOS O O O OTHERS
+BOS 导航 去 文安鲁能生态区酒店 EOS O O O destination navigation.navigation
+BOS 769 EOS O O OTHERS
+BOS 伊泽 EOS O O OTHERS
+BOS 400 EOS O O OTHERS
+BOS 奔驰 g400 EOS O O O OTHERS
+BOS 我要 去 二支路口 EOS O O O destination navigation.navigation
+BOS 我要 去 西湖公园 EOS O O O destination navigation.navigation
+BOS 打电话 给 6922 EOS O O O phone_num phone_call.make_a_phone_call
+BOS 打电话 给 15000009199 EOS O O O phone_num phone_call.make_a_phone_call
+BOS 李红 EOS O O OTHERS
+BOS 亲爱 的 拜拜 天 末日 EOS O O O O O O OTHERS
+BOS 切换 到 白天 模式 EOS O O O O O OTHERS
+BOS 取消 EOS O O OTHERS
+BOS 我想 听 社会摇 EOS O O O O song music.play
+BOS 战舰 EOS O O OTHERS
+BOS 阿布 EOS O singer music.play
+BOS 白夜 EOS O O OTHERS
+BOS 李萍 EOS O O OTHERS
+BOS 关滨 EOS O O OTHERS
+BOS 猫 EOS O O OTHERS
+BOS 可乐 EOS O O OTHERS
+BOS 滚 EOS O O OTHERS
+BOS 取消 EOS O O OTHERS
+BOS 放些 歌 听 EOS O O O O music.play
+BOS 成都 EOS O song music.play
+BOS 来 一首 成都 EOS O O O song music.play
+BOS 能 不能 EOS O O O OTHERS
+BOS 邓戈 EOS O O OTHERS
+BOS 播放歌曲 EOS O O music.play
+BOS 播放歌曲 换 一首歌 EOS O O O O music.next
+BOS 听 凉凉 EOS O O song music.play
+BOS 放 一首 烟花树下的约定 EOS O O O song music.play
+BOS 放 一首 樱花树下的约定 EOS O O O song music.play
+BOS 播放 散就散 EOS O O song music.play
+BOS 听 杨坤 的 歌 EOS O O singer O O music.play
+BOS 结束 导航 EOS O O O navigation.cancel_navigation
+BOS 打 给 760 EOS O O O phone_num phone_call.make_a_phone_call
+BOS 关闭 音乐 EOS O O O music.pause
+BOS 打开 EOS O O OTHERS
+BOS 发短信 EOS O O OTHERS
+BOS 发短信 EOS O O OTHERS
+BOS 发短信 EOS O O OTHERS
+BOS 韩红 的 歌曲 EOS O singer O O music.play
+BOS 青藏高原 EOS O song music.play
+BOS 天路 EOS O song music.play
+BOS 天路 EOS O song music.play
+BOS 请 播放 都选c EOS O O O song music.play
+BOS 请 播放 摇滚 版 都选c EOS O O O style O song music.play
+BOS 放 塑料袋 EOS O O song music.play
+BOS 来 一首 冬天里一把火 EOS O O O song music.play
+BOS 来 一首 星星点灯 EOS O O O song music.play
+BOS 李强 EOS O O OTHERS
+BOS 花 EOS O O OTHERS
+BOS 拼 才会赢 EOS O O O OTHERS
+BOS 给我 来 一首 爱拼才会赢 EOS O O O O O song music.play
+BOS 呼叫 666611 EOS O O phone_num phone_call.make_a_phone_call
+BOS 播放 刘德华 的 忘情水 EOS O O singer O song music.play
+BOS 我要 到 合肥 EOS O O O destination navigation.navigation
+BOS 播放 一首 壮志豪情 EOS O O O song music.play
+BOS 播放 一首 张文良 的 歌 EOS O O O singer O O music.play
+BOS 播放 一首 一二三四五六七 EOS O O O song music.play
+BOS 梦中的兰花花 EOS O song music.play
+BOS 甘肃老家 EOS O destination navigation.navigation
+BOS 歌在飞 EOS O song music.play
+BOS 播放歌曲 EOS O O music.play
+BOS 小睿 EOS O singer music.play
+BOS 播放 下 一首 EOS O O O O music.next
+BOS 播放歌曲 EOS O O music.play
+BOS 我要 回家 EOS O O O custom_destination navigation.navigation
+BOS 大同路95号夺宝奇兵 EOS O destination navigation.navigation
+BOS 大同路95号 EOS O destination navigation.navigation
+BOS 电话 给 件滑 EOS O O O contact_name phone_call.make_a_phone_call
+BOS 打开 媒体 EOS O O O OTHERS
+BOS 好 的 EOS O O O OTHERS
+BOS 曹杨 EOS O destination navigation.navigation
+BOS 叮当 EOS O O OTHERS
+BOS 凉凉 这 首歌 EOS O song O O music.play
+BOS 播放 像我这样的人 EOS O O song music.play
+BOS 播放 量量 EOS O O song music.play
+BOS 伍佰 的 歌 EOS O singer O O music.play
+BOS 任贤齐 的 歌 EOS O singer O O music.play
+BOS 伤心太平洋 EOS O song music.play
+BOS 关掉 EOS O O OTHERS
+BOS 能 打开 音乐 吗 EOS O O O O O music.play
+BOS 比如说 你 要 打电话 给 张三 上面 有的 EOS O O O O O O contact_name O O O phone_call.make_a_phone_call
+BOS 打电话 给 陈先生 EOS O O O contact_name phone_call.make_a_phone_call
+BOS 晓橙 EOS O O OTHERS
+BOS 咖咖 EOS O O O OTHERS
+BOS 喀什东路 是 乐 橙 EOS O destination O O O navigation.navigation
+BOS 天骄小学 的 路 EOS O destination O O navigation.navigation
+BOS 新建小学 的 路 怎么 走 EOS O destination O O O O navigation.navigation
+BOS 电话 给 5551 EOS O O O phone_num phone_call.make_a_phone_call
+BOS 打电话 给 551 EOS O O O phone_num phone_call.make_a_phone_call
+BOS 导航 结束 EOS O O O navigation.cancel_navigation
+BOS 导航 结束 EOS O O O navigation.cancel_navigation
+BOS 导航 结束 EOS O O O navigation.cancel_navigation
+BOS 发给 叶倩 EOS O O O OTHERS
+BOS 打电话 给 叶倩 EOS O O O contact_name phone_call.make_a_phone_call
+BOS 打电话 给 秀群 EOS O O O contact_name phone_call.make_a_phone_call
+BOS 打电话 给 秀群 EOS O O O contact_name phone_call.make_a_phone_call
+BOS 结束 导航 EOS O O O navigation.cancel_navigation
+BOS 拨打 电话 13600008065 EOS O O O phone_num phone_call.make_a_phone_call
+BOS 拨打 电话 13600008065 EOS O O O phone_num phone_call.make_a_phone_call
+BOS 关闭 EOS O O phone_call.cancel
+BOS 我 越 想 越 觉得 害怕 大家 我说 昨天 喝酒 考 更好 床 进行 了 100 块钱 倒 无所谓 EOS O O O O O O O O O O O O O O O O O O O O O OTHERS
+BOS 你们 热不冷 吗 你 可 记住 EOS O O O O O O O OTHERS
+BOS 请系 好 安全带 注意 行车 安全 17 分前 到达 约定 地点 EOS O O O O O O O O O O O O OTHERS
+BOS 导航 技术 EOS O O O OTHERS
+BOS 点歌 EOS O O music.play
+BOS 来 一首 刀郎 的 歌 EOS O O O singer O O music.play
+BOS 关闭 音乐 EOS O O O music.pause
+BOS 打 吧 EOS O O O OTHERS
+BOS 导航 去 周大郢 EOS O O O destination navigation.navigation
+BOS 中大银泰 EOS O destination navigation.navigation
+BOS 后来 你家 那个 小孩儿 长治 一中 EOS O O O O O O O OTHERS
+BOS 鲍鹏山 EOS O O OTHERS
+BOS 啊 你 跟 她 说 一下 是 一周 EOS O O O O O O O O O OTHERS
+BOS 佟有 为 EOS O O O OTHERS
+BOS 打电话 给 吗 EOS O O O contact_name phone_call.make_a_phone_call
+BOS 打电话 给 吗 EOS O O O contact_name phone_call.make_a_phone_call
+BOS 我想 听 鬼故事 EOS O O O O O OTHERS
+BOS 导航 EOS O O navigation.open
+BOS 吉娅 EOS O O OTHERS
+BOS 我 需要 帮忙 EOS O O O O OTHERS
+BOS 你 会 什么 EOS O O O O OTHERS
+BOS 我用 什么 方式 唤醒 你 EOS O O O O O O OTHERS
+BOS 讲个 笑话 EOS O O O OTHERS
+BOS 朱峰 EOS O O OTHERS
+BOS 爸爸去哪儿 EOS O song music.play
+BOS 歌曲 三年 EOS O O song music.play
+BOS 3d 环绕 EOS O O O OTHERS
+BOS 你 会 打牌 呀 EOS O O O O O OTHERS

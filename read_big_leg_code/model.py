@@ -19,10 +19,14 @@ class Model:
         self.intent_size = intent_size
         self.epoch_num = epoch_num
         if embedding_w is None:
-            tf.random_uniform([self.vocab_size, self.embedding_size],
-                              -0.1, 0.1)
+            self.embeddings = tf.get_variable(initializer=tf.random_uniform([self.vocab_size, self.embedding_size],
+                                                                            -0.1, 0.1), dtype=tf.float32,
+                                              name="embedding")
+
         else:
             self.embedding_W = embedding_w
+            self.embeddings = tf.get_variable(initializer=self.embedding_W, dtype=tf.float32, name="embedding")
+
         # 每句输入的实际长度，除了padding
         self.encoder_inputs_actual_length = tf.placeholder(tf.int32, [batch_size],
                                                            name='encoder_inputs_actual_length')
@@ -33,16 +37,15 @@ class Model:
                                              name='intent_targets')
 
     def build(self):
-        with tf.name_scope('embedding_layer'):
+        with tf.variable_scope('embedding_layer'):
             self.encoder_inputs = tf.placeholder(tf.int32, [self.input_steps, self.batch_size],
                                                  name='encoder_inputs')
-            self.embeddings = tf.Variable(self.embedding_W, dtype=tf.float32, name="embedding")
 
             # self.embeddings
             self.encoder_inputs_embedded = tf.nn.embedding_lookup(self.embeddings, self.encoder_inputs)
             # <tf.Tensor 'embedding_layer/embedding_lookup:0' shape=(30, 64, 100) dtype=float32>
 
-        with tf.name_scope('encoder_layer'):
+        with tf.variable_scope('encoder_layer'):
             # 使用单个LSTM cell
             encoder_f_cell_0 = LSTMCell(self.hidden_size, initializer=tf.orthogonal_initializer())
             encoder_b_cell_0 = LSTMCell(self.hidden_size, initializer=tf.orthogonal_initializer())
@@ -79,23 +82,24 @@ class Model:
             #     c=encoder_final_state_c,
             #     h=encoder_final_state_h
             # )
-            intent_W = tf.Variable(tf.random_uniform([self.hidden_size * 2, self.intent_size], -0.1, 0.1),
-                                   dtype=tf.float32, name="intent_W")
-            intent_b = tf.Variable(tf.zeros([self.intent_size]), dtype=tf.float32, name="intent_b")
+            intent_W = tf.get_variable(
+                initializer=tf.random_uniform([self.hidden_size * 2, self.intent_size], -0.1, 0.1),
+                dtype=tf.float32, name="intent_W")
+            intent_b = tf.get_variable(initializer=tf.zeros([self.intent_size]), dtype=tf.float32, name="intent_b")
 
             # 求intent [句子数量,cell_num*2(concat)] + intene_W(cell_num*2,intent_size) + b
             intent_logits = tf.add(tf.matmul(encoder_final_state_h, intent_W), intent_b)
             # intent_prob = tf.nn.softmax(intent_logits)
             self.intent = tf.argmax(intent_logits, axis=1)
 
-        with tf.name_scope('decoder_layer'):
+        with tf.variable_scope('decoder_layer'):
             decoder_lengths = self.encoder_inputs_actual_length
 
-            with tf.name_scope('helper_function'):
+            with tf.variable_scope('helper_function'):
                 # 这块开始就出现helper的代码了 完全是迷
-                # self.slot_W = tf.Variable(tf.random_uniform([self.hidden_size * 2, self.slot_size], -1, 1),
+                # self.slot_W = tf.get_variable(tf.random_uniform([self.hidden_size * 2, self.slot_size], -1, 1),
                 #                           dtype=tf.float32, name="slot_W")
-                # self.slot_b = tf.Variable(tf.zeros([self.slot_size]), dtype=tf.float32, name="slot_b")
+                # self.slot_b = tf.get_variable(tf.zeros([self.slot_size]), dtype=tf.float32, name="slot_b")
                 sos_time_slice = tf.ones([self.batch_size], dtype=tf.int32, name='SOS') * 2
                 sos_step_embedded = tf.nn.embedding_lookup(self.embeddings, sos_time_slice)
                 # pad_time_slice = tf.zeros([self.batch_size], dtype=tf.int32, name='PAD')
@@ -140,7 +144,7 @@ class Model:
 
                 # 转化下shape TensorShape([Dimension(16), Dimension(50), Dimension(200)])
 
-            with tf.name_scope('attention'):
+            with tf.variable_scope('attention'):
                 memory = tf.transpose(encoder_outputs, [1, 0, 2])
                 # Bahdanau 加法注意力 Luong 乘法注意力
                 attention_mechanism = tf.contrib.seq2seq.BahdanauAttention(
@@ -172,7 +176,6 @@ class Model:
             )
             outputs = final_outputs
 
-
         # 这个就是 槽输出
         self.decoder_prediction = outputs.sample_id
         # max_step对应的是slot输出 batch_size 是句子 dim是输出
@@ -184,7 +187,7 @@ class Model:
         # 定义mask，使padding不计入loss计算
         self.mask = tf.to_float(tf.not_equal(self.decoder_targets_true_length, 0))
         # 定义slot标注的损失
-        with tf.name_scope("lose_function"):
+        with tf.variable_scope("lose_function"):
             loss_slot = tf.contrib.seq2seq.sequence_loss(
                 outputs.rnn_output, self.decoder_targets_true_length, weights=self.mask)
 
@@ -201,33 +204,46 @@ class Model:
             # tf.summary.scalar('loss_intent', loss_intent)
             # tf.summary.scalar('all_loss', self.loss)
 
-        with tf.name_scope("optimizer_function"):
+        with tf.variable_scope("optimizer_function"):
             optimizer = tf.train.AdamOptimizer(name="a_optimizer", learning_rate=0.001)
             self.grads, self.vars = zip(*optimizer.compute_gradients(self.loss))
             # print("vars for loss function: ", self.vars)
             self.gradients, _ = tf.clip_by_global_norm(self.grads, 5)  # clip gradients
             self.train_op = optimizer.apply_gradients(zip(self.gradients, self.vars))
 
-        with tf.name_scope("accuracy"):
-            self.intent_accs_placeholder = tf.placeholder(shape=[None], dtype=tf.float32)
-            self.slot_accs_placeholder = tf.placeholder(shape=[None], dtype=tf.float32)
+        with tf.variable_scope("accuracy"):
+            self.intent_accs_placeholder = tf.placeholder(shape=[None], dtype=tf.float32,
+                                                          name="intent_accs_placeholder")
+            self.slot_accs_placeholder = tf.placeholder(shape=[None], dtype=tf.float32,
+                                                        name="slot_accs_placeholder")
             self.intent_accs_op = tf.reduce_mean(self.intent_accs_placeholder)
             self.slot_accs_op = tf.reduce_mean(self.slot_accs_placeholder)
             tf.summary.scalar("intent_acc", self.intent_accs_op)
             tf.summary.scalar("slot_acc", self.slot_accs_op)
 
-    def step(self, sess, trarin_batch):
+    def step(self, sess, trarin_batch, is_Test=False):
         """ perform each batch"""
 
-        unziped = list(zip(*trarin_batch))
+        if is_Test is False:
+            unziped = list(zip(*trarin_batch))
 
-        output_feeds = [self.train_op, self.loss, self.decoder_prediction,
-                        self.intent, self.mask]
-        feed_dict = {self.encoder_inputs: np.transpose(unziped[0], [1, 0]),
-                     self.encoder_inputs_actual_length: unziped[1],
-                     self.decoder_targets: unziped[2],
-                     self.intent_targets: unziped[3]}
-        results = sess.run(output_feeds, feed_dict=feed_dict)
+            output_feeds = [self.train_op, self.loss, self.decoder_prediction,
+                            self.intent, self.mask]
+            feed_dict = {self.encoder_inputs: np.transpose(unziped[0], [1, 0]),
+                         self.encoder_inputs_actual_length: unziped[1],
+                         self.decoder_targets: unziped[2],
+                         self.intent_targets: unziped[3]}
+            results = sess.run(output_feeds, feed_dict=feed_dict)
+        else:
+            unziped = list(zip(*trarin_batch))
+
+            output_feeds = [self.decoder_prediction, self.intent]
+            feed_dict = {
+                self.encoder_inputs: np.transpose(unziped[0], [1, 0]),
+                self.encoder_inputs_actual_length: unziped[1],
+            }
+            results = sess.run(output_feeds, feed_dict=feed_dict)
+
         return results
 
     def get_score(self, sess, intent_accs, slot_accs, merged_summary):

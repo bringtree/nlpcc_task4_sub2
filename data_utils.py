@@ -55,6 +55,7 @@ labels = [v[-1].replace('\n', '') for v in raw_data]
 train_test_X, train_test_slot_sentences, train_test_Y, dev_X, dev_slot_sentences, dev_Y = k_fold(5, X=sentences,
                                                                                                  Y=labels,
                                                                                                  slot_sentences=slot_sentences)
+
 train_X, train_slot_sentences, train_Y, test_X, test_slot_sentences, test_Y = k_fold(10, X=train_test_X[0],
                                                                                      Y=train_test_Y[0],
                                                                                      slot_sentences=slot_sentences)
