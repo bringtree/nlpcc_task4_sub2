@@ -2,6 +2,7 @@ from data import *
 import numpy as np
 import os
 from data_utils import k_fold
+import pickle
 
 input_steps = 30
 with open("/Users/huangpeisong/Desktop/task-slu-tencent.dingdang/rnn/test_data.txt") as fp:
@@ -46,13 +47,20 @@ word2index, index2word, slot2index, index2slot, intent2index, index2intent = \
     get_info_from_training_data(train_data_ed, test_data_ed)
 
 # 保存字典
-np.save("index2word_dict.npy", index2word)
-np.save("index2slot_dict.npy", index2slot)
-np.save("index2intent_dict.npy", index2intent)
 
-np.save("word2index_dict.npy", word2index)
-np.save("slot2index_dict.npy", slot2index)
-np.save("intent2index_dict.npy", intent2index)
+with open("index2word_dict.pkl", "wb") as fp:
+    pickle.dump(index2word, fp)
+with open("index2slot_dict.pkl", "wb") as fp:
+    pickle.dump(index2slot, fp)
+with open("index2intent_dict.pkl", "wb") as fp:
+    pickle.dump(index2intent, fp)
+
+with open("word2index_dict.pkl", "wb") as fp:
+    pickle.dump(word2index, fp)
+with open("slot2index_dict.pkl", "wb") as fp:
+    pickle.dump(slot2index, fp)
+with open("intent2index_dict.pkl", "wb") as fp:
+    pickle.dump(intent2index, fp)
 
 
 # 测试

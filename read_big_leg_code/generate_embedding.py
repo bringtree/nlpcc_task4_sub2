@@ -1,4 +1,4 @@
-from read_big_leg_code.data import *
+from data import *
 import fastText as fasttext
 import os
 import pickle
@@ -44,17 +44,25 @@ for idx in range(len(test_X)):
     test_data.append(tmp)
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-train_data_ed = data_pipeline(train_data, length=input_steps)
-test_data_ed = data_pipeline(test_data, length=input_steps)
+# train_data_ed = data_pipeline(train_data, length=input_steps)
+# test_data_ed = data_pipeline(test_data, length=input_steps)
 
 # 生成6份字典 分别是 句子中的词 -> 序号  序号-> 句子中的词   (slot intent 同理)
 # 这里加入测试集 只是为了 给测试集的句子中的词 也有一个编号而已
-word2index = np.load("word2index_dict.npy")
-index2word = np.load("index2word_dict.npy")
-slot2index = np.load("slot2index_dict.npy")
-index2slot = np.load("index2slot_dict.npy")
-intent2index = np.load("intent2index_dict.npy")
-index2intent = np.load("index2intent_dict.npy")
+
+with open("index2word_dict.pkl", "wb") as fp:
+    word2index = pickle.load(fp)
+with open("index2slot_dict.pkl", "wb") as fp:
+    index2word = pickle.load(fp)
+with open("index2intent_dict.pkl", "wb") as fp:
+    slot2index = pickle.load(fp)
+
+with open("word2index_dict.pkl", "wb") as fp:
+    index2slot = pickle.load(fp)
+with open("slot2index_dict.pkl", "wb") as fp:
+    intent2index = pickle.load(fp)
+with open("intent2index_dict.pkl", "wb") as fp:
+    index2intent = pickle.load(fp)
 
 intent_size = len(intent2index)
 vocab_size = len(word2index)
