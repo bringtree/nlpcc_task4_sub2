@@ -17,15 +17,15 @@ slot_size = 30
 epoch_num = 20
 enable_w2v = False
 
-train_X = np.load('/Users/huangpeisong/Desktop/task-slu-tencent.dingdang/rnn/read_big_leg_code/train_input.npy')
+train_X = np.load('train_input.npy')
 train_slot_sentences = np.load(
-    '/Users/huangpeisong/Desktop/task-slu-tencent.dingdang/rnn/read_big_leg_code/train_slot.npy')
-train_Y = np.load('/Users/huangpeisong/Desktop/task-slu-tencent.dingdang/rnn/read_big_leg_code/train_intent.npy')
+    'train_slot.npy')
+train_Y = np.load('train_intent.npy')
 
-test_X = np.load('/Users/huangpeisong/Desktop/task-slu-tencent.dingdang/rnn/read_big_leg_code/test_input.npy')
+test_X = np.load('test_input.npy')
 test_slot_sentences = np.load(
-    '/Users/huangpeisong/Desktop/task-slu-tencent.dingdang/rnn/read_big_leg_code/test_slot.npy')
-test_Y = np.load('/Users/huangpeisong/Desktop/task-slu-tencent.dingdang/rnn/read_big_leg_code/test_intent.npy')
+    'test_slot.npy')
+test_Y = np.load('test_intent.npy')
 
 train_data = []
 for idx in range(len(train_X)):
@@ -50,31 +50,31 @@ for idx in range(len(test_X)):
 # 生成6份字典 分别是 句子中的词 -> 序号  序号-> 句子中的词   (slot intent 同理)
 # 这里加入测试集 只是为了 给测试集的句子中的词 也有一个编号而已
 
-with open("index2word_dict.pkl", "wb") as fp:
+with open("index2word_dict.pkl", "rb") as fp:
     word2index = pickle.load(fp)
-with open("index2slot_dict.pkl", "wb") as fp:
+with open("index2slot_dict.pkl", "rb") as fp:
     index2word = pickle.load(fp)
-with open("index2intent_dict.pkl", "wb") as fp:
+with open("index2intent_dict.pkl", "rb") as fp:
     slot2index = pickle.load(fp)
 
-with open("word2index_dict.pkl", "wb") as fp:
+with open("word2index_dict.pkl", "rb") as fp:
     index2slot = pickle.load(fp)
-with open("slot2index_dict.pkl", "wb") as fp:
+with open("slot2index_dict.pkl", "rb") as fp:
     intent2index = pickle.load(fp)
-with open("intent2index_dict.pkl", "wb") as fp:
+with open("intent2index_dict.pkl", "rb") as fp:
     index2intent = pickle.load(fp)
 
 intent_size = len(intent2index)
-vocab_size = len(word2index)
+# vocab_size = len(word2index)
 # 接下来 完成 编码
-index_train = to_index(train_data_ed, word2index, slot2index, intent2index)
-index_test = to_index(test_data_ed, word2index, slot2index, intent2index, isTest=True)
-
-w2v_model_bin = "/home/bringtree/data/wiki.zh.bin"
-w2v_model = fasttext.load_model(w2v_model_bin)
-embedding_W = np.eye(vocab_size, embedding_size)
-for key, value in word2index.items():
-    embedding_W[value] = w2v_model.get_word_vector(key)
-
-with open("embedding_W.pkl", "wb") as fp:
-    pickle.dump(embedding_W, fp)
+# index_train = to_index(train_data_ed, word2index, slot2index, intent2index)
+# index_test = to_index(test_data_ed, word2index, slot2index, intent2index, isTest=True)
+#
+# w2v_model_bin = "/home/bringtree/data/wiki.zh.bin"
+# w2v_model = fasttext.load_model(w2v_model_bin)
+# embedding_W = np.eye(vocab_size, embedding_size)
+# for key, value in word2index.items():
+#     embedding_W[value] = w2v_model.get_word_vector(key)
+#
+# with open("embedding_W.pkl", "wb") as fp:
+#     pickle.dump(embedding_W, fp)
