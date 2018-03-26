@@ -2,13 +2,13 @@
 from data_utils import k_fold
 import numpy as np
 
-with open("/Users/huangpeisong/Desktop/task-slu-tencent.dingdang/rnn/read_big_leg_code/test_data.txt") as fp:
+with open("/Users/huangpeisong/Desktop/task-slu-tencent.dingdang/rnn/test_data.txt") as fp:
     raw_data = [v.split(' ') for v in fp.readlines()]
 
 sentences = [v[1:v.index("EOS")] for v in raw_data]
 slot_sentences = [v[v.index("EOS") + 2:-1] for v in raw_data]
 labels = [v[-1].replace('\n', '') for v in raw_data]
-train_X, train_slot_sentences, train_Y, test_X, test_slot_sentences, test_Y = k_fold(2, X=sentences, Y=labels,
+train_X, train_slot_sentences, train_Y, test_X, test_slot_sentences, test_Y = k_fold(10, X=sentences, Y=labels,
                                                                                      slot_sentences=slot_sentences)
 
 train_input = train_X[0]

@@ -2,7 +2,7 @@
 # @author: cer
 import tensorflow as tf
 from data import *
-from model import Model
+from model_without_embedding import Model
 from my_metrics import *
 from tensorflow.python import debug as tf_debug
 import numpy as np
@@ -78,7 +78,7 @@ else:
 
 def get_model():
     model = Model(input_steps, embedding_size, hidden_size, vocab_size, slot_size,
-                  intent_size, epoch_num, batch_size, embedding_W)
+                  intent_size, epoch_num, batch_size)
     model.build()
     return model
 
@@ -87,31 +87,7 @@ def train():
     model = get_model()
     sess = tf.Session()
     # sess = tf_debug.LocalCLIDebugWrapperSession(sess)
-    saver = tf.train.Saver(max_to_keep=5)
     sess.run(tf.global_variables_initializer())
-    ckpt = tf.train.get_checkpoint_state(ckpt_path)
-
-    # for epoch in range(epoch_num):
-    #     mean_loss = 0.0
-    #     train_loss = 0.0
-    #     for i, batch in enumerate(getBatch(batch_size, index_train,random_data=False)):
-    #         # 执行一个batch的训练
-    #         _, loss, decoder_prediction, intent, mask = model.step(sess, batch)
-    #         mean_loss += loss
-    #         train_loss += loss
-    #         if i % 10 == 0:
-    #             if i > 0:
-    #                 mean_loss = mean_loss / 10.0
-    #             print('~~~~~~~~Average train loss at epoch %d, step %d: %f' % (epoch, i, mean_loss))
-    #             mean_loss = 0
-    #     train_loss /= (i + 1)
-    #     # print("[Epoch {}] Average train loss: {}".format(epoch, train_loss))
-    #     saver.save(sess, ckpt_path+"/model", global_step=epoch)
-    #
-    # ckpt = tf.train.get_checkpoint_state(ckpt_path)
-
-    saver.restore(sess, ckpt.model_checkpoint_path)
-
     for epoch in range(epoch_num):
         mean_loss = 0.0
         train_loss = 0.0
@@ -126,8 +102,7 @@ def train():
                 print('~~~~~~~~Average train loss at epoch %d, step %d: %f' % (epoch, i, mean_loss))
                 mean_loss = 0
         train_loss /= (i + 1)
-        # print("[Epoch {}] Average train loss: {}".format(epoch, train_loss))
-        # saver.save(sess, ckpt_path+"/model", global_step=epoch)
+        print("[Epoch {}] Average train loss: {}".format(epoch, train_loss))
 
 
 if __name__ == '__main__':

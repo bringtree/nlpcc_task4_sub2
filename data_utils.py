@@ -15,7 +15,7 @@ def k_fold(k, X, Y, slot_sentences=None):
     :return:训练集的特征，训练集的标签，和测试集的特征，测试集的标签
     """
 
-    sfolder = StratifiedKFold(n_splits=k, random_state=random.seed(), shuffle=True)
+    sfolder = StratifiedKFold(n_splits=k, random_state=42, shuffle=True)
     train_index = []
     test_index = []
 

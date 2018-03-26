@@ -45,17 +45,17 @@ def k_fold(k, X, Y, slot_sentences=None):
     return train_X, train_Y, test_X, test_Y
 
 
-with open("test_data.txt") as fp:
-    raw_data = [v.split(' ') for v in fp.readlines()]
-
-sentences = [v[1:v.index("EOS")] for v in raw_data]
-slot_sentences = [v[v.index("EOS") + 1:-1] for v in raw_data]
-labels = [v[-1].replace('\n', '') for v in raw_data]
-
-train_test_X, train_test_slot_sentences, train_test_Y, dev_X, dev_slot_sentences, dev_Y = k_fold(5, X=sentences,
-                                                                                                 Y=labels,
-                                                                                                 slot_sentences=slot_sentences)
-train_X, train_slot_sentences, train_Y, test_X, test_slot_sentences, test_Y = k_fold(10, X=train_test_X[0],
-                                                                                     Y=train_test_Y[0],
-                                                                                     slot_sentences=slot_sentences)
-
+# with open("test_data.txt") as fp:
+#     raw_data = [v.split(' ') for v in fp.readlines()]
+#
+# sentences = [v[1:v.index("EOS")] for v in raw_data]
+# slot_sentences = [v[v.index("EOS") + 1:-1] for v in raw_data]
+# labels = [v[-1].replace('\n', '') for v in raw_data]
+#
+# train_test_X, train_test_slot_sentences, train_test_Y, dev_X, dev_slot_sentences, dev_Y = k_fold(5, X=sentences,
+#                                                                                                  Y=labels,
+#                                                                                                  slot_sentences=slot_sentences)
+# train_X, train_slot_sentences, train_Y, test_X, test_slot_sentences, test_Y = k_fold(10, X=train_test_X[0],
+#                                                                                      Y=train_test_Y[0],
+#                                                                                      slot_sentences=train_test_slot_sentences)
+#

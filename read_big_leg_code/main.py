@@ -10,7 +10,6 @@ from data_utils import k_fold
 import fastText as fasttext
 import os
 
-
 ckpt_path = './ckpt2/'
 input_steps = 30
 embedding_size = 300
@@ -25,25 +24,15 @@ slot_size = 30
 epoch_num = 20
 enable_w2v = False
 
-# 这块到时候替换掉 ~~~~~~~~~~~~~~~~
-# with open("/Users/huangpeisong/Desktop/task-slu-tencent.dingdang/rnn/read_big_leg_code/test_data.txt") as fp:
-#     raw_data = [v.split(' ') for v in fp.readlines()]
-#
-# sentences = [v[1:v.index("EOS")] for v in raw_data]
-# slot_sentences = [v[v.index("EOS") + 2:-1] for v in raw_data]
-# labels = [v[-1].replace('\n', '') for v in raw_data]
-# train_X, train_slot_sentences, train_Y, test_X, test_slot_sentences, test_Y = k_fold(2, X=sentences, Y=labels,
-#                                                                                      slot_sentences=slot_sentences)
-
 train_X = np.load('/Users/huangpeisong/Desktop/task-slu-tencent.dingdang/rnn/read_big_leg_code/train_input.npy')
-train_slot_sentences = np.load('/Users/huangpeisong/Desktop/task-slu-tencent.dingdang/rnn/read_big_leg_code/train_slot.npy')
+train_slot_sentences = np.load(
+    '/Users/huangpeisong/Desktop/task-slu-tencent.dingdang/rnn/read_big_leg_code/train_slot.npy')
 train_Y = np.load('/Users/huangpeisong/Desktop/task-slu-tencent.dingdang/rnn/read_big_leg_code/train_intent.npy')
 
-
 test_X = np.load('/Users/huangpeisong/Desktop/task-slu-tencent.dingdang/rnn/read_big_leg_code/test_input.npy')
-test_slot_sentences = np.load('/Users/huangpeisong/Desktop/task-slu-tencent.dingdang/rnn/read_big_leg_code/test_slot.npy')
+test_slot_sentences = np.load(
+    '/Users/huangpeisong/Desktop/task-slu-tencent.dingdang/rnn/read_big_leg_code/test_slot.npy')
 test_Y = np.load('/Users/huangpeisong/Desktop/task-slu-tencent.dingdang/rnn/read_big_leg_code/test_intent.npy')
-
 
 train_data = []
 for idx in range(len(train_X)):
@@ -67,13 +56,18 @@ test_data_ed = data_pipeline(test_data, length=input_steps)
 
 # 生成6份字典 分别是 句子中的词 -> 序号  序号-> 句子中的词   (slot intent 同理)
 # 这里加入测试集 只是为了 给测试集的句子中的词 也有一个编号而已
-word2index, index2word, slot2index, index2slot, intent2index, index2intent = \
-    get_info_from_training_data(train_data_ed,test_data_ed)
+word2index = np.load("word2index_dict.npy")
+index2word = np.load("index2word_dict.npy")
+slot2index = np.load("slot2index_dict.npy")
+index2slot = np.load("index2slot_dict.npy")
+intent2index = np.load("intent2index_dict.npy")
+index2intent = np.load("index2intent_dict.npy")
+
 intent_size = len(intent2index)
 vocab_size = len(word2index)
 # 接下来 完成 编码
 index_train = to_index(train_data_ed, word2index, slot2index, intent2index)
-index_test = to_index(test_data_ed, word2index, slot2index, intent2index,isTest=True)
+index_test = to_index(test_data_ed, word2index, slot2index, intent2index, isTest=True)
 
 # [self.vocab_size, self.embedding_size]
 if enable_w2v is True:
@@ -127,9 +121,9 @@ def train(is_debug=False):
         slot_accs = []
         intent_accs = []
         if epoch == 19:
-            for j, batch in enumerate(getBatch(batch_size, index_test,random_data=False)):
+            for j, batch in enumerate(getBatch(batch_size, index_test, random_data=False)):
 
-                decoder_prediction, intent= model.step(sess, batch,is_Test = True)
+                decoder_prediction, intent = model.step(sess, batch, is_Test=True)
                 # writer.add_summary(result_board, epoch)
 
                 decoder_prediction = np.transpose(decoder_prediction, [1, 0])
@@ -139,7 +133,8 @@ def train(is_debug=False):
                         sen_len = batch[index][1]
                         print("Input Sentence        : ", index_seq2word(batch[index][0], index2word)[:sen_len])
                         # print("Slot Truth            : ", index_seq2slot(batch[index][2], index2slot)[:sen_len])
-                        print("Slot Prediction       : ", index_seq2slot(decoder_prediction[index], index2slot)[:sen_len])
+                        print("Slot Prediction       : ",
+                              index_seq2slot(decoder_prediction[index], index2slot)[:sen_len])
                         # print("Intent Truth          : ", index2intent[batch[index][3]])
                         print("Intent Prediction     : ", index2intent[intent[index]])
         #     slot_pred_length = list(np.shape(decoder_prediction))[1]
@@ -170,6 +165,7 @@ def train(is_debug=False):
         # print("Slot accuracy for epoch {}: {}".format(epoch, slot_accuracy))
         # print("Slot F1 score for epoch {}: {}".format(epoch, f1_for_sequence_batch(true_slots_a, pred_slots_a)))
         #
+
 
 if __name__ == '__main__':
     train()
