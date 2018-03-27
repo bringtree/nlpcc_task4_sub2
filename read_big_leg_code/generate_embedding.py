@@ -1,6 +1,7 @@
 # 用来生成 embedding中的词向量
-from data import *
+from utils import *
 import fastText as fasttext
+import numpy as np
 import os
 import pickle
 

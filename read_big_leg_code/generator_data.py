@@ -1,5 +1,5 @@
 # 生成 数据集
-from data_utils import k_fold
+from utils import *
 import numpy as np
 
 with open("/Users/huangpeisong/Desktop/task-slu-tencent.dingdang/rnn/test_data.txt") as fp:

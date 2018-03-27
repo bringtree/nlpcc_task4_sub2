@@ -1,12 +1,12 @@
 # coding=utf-8
 # @author: cer
 import tensorflow as tf
-from data import *
+from utils import *
 from model import Model
 from my_metrics import *
 from tensorflow.python import debug as tf_debug
 import numpy as np
-from data_utils import k_fold
+from utils import *
 import fastText as fasttext
 import os
 import pickle

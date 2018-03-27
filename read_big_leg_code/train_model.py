@@ -1,7 +1,7 @@
 # coding=utf-8
 # @author: cer
 import tensorflow as tf
-from data import *
+from utils import *
 from model import Model
 import numpy as np
 import pickle

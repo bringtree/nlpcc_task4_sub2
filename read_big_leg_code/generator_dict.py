@@ -1,8 +1,7 @@
 # 生成字典
-from data import *
+from utils import *
 import numpy as np
 import os
-from data_utils import k_fold
 import pickle
 
 input_steps = 30
