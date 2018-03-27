@@ -47,12 +47,13 @@ def data_pipeline(data, length=50, isTset=False):
 
 
 # 做一个字典
-def get_info_from_training_data(data, test_data):
+def get_info_from_training_data(data, test_data=None):
     seq_in, seq_out, intent = list(zip(*data))
-    test_seq_in = list(zip(*test_data))
     vocab = set(flatten(seq_in))
-    tmp_cab = set(flatten(test_seq_in[0]))
-    vocab |= set(tmp_cab)
+    if test_data == None:
+        test_seq_in = list(zip(*test_data))
+        tmp_cab = set(flatten(test_seq_in[0]))
+        vocab |= set(tmp_cab)
     slot_tag = set(flatten(seq_out))
     intent_tag = set(intent)
     # 生成word2index 句子字典
@@ -111,6 +112,7 @@ def testBatch(batch_size, train_data, random_data=False):
 
 
 def to_index(train, word2index, slot2index, intent2index, isTest=False):
+    # 我留个isTest 是为了做单独的意图计算。
     new_train = []
 
     if isTest is False:

@@ -1,9 +1,9 @@
+# 用来生成 embedding中的词向量
 from data import *
 import fastText as fasttext
 import os
 import pickle
 
-ckpt_path = './ckpt2/'
 input_steps = 30
 embedding_size = 300
 # lstm 隐藏层单元参数的大小
@@ -79,4 +79,3 @@ for key, value in word2index.items():
 
 with open("embedding_W.pkl", "wb") as fp:
     pickle.dump(embedding_W, fp)
-#

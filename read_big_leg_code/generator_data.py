@@ -1,4 +1,4 @@
-# 这块到时候替换掉 ~~~~~~~~~~~~~~~~
+# 生成 数据集
 from data_utils import k_fold
 import numpy as np
 

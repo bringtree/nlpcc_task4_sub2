@@ -1,3 +1,4 @@
+# 生成字典
 from data import *
 import numpy as np
 import os

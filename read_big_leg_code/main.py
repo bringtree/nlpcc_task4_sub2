@@ -164,6 +164,9 @@ def train(is_debug=False):
                                      mode="constant", constant_values=0)
             pred_slots.append(pred_padded)
         #     # print("slot_pred_length: ", slot_pred_length)
+
+
+            # 这块计算准确的代码 我总觉得 有什么问题 但是 就是感觉不出来。。。
             true_slot = np.array((list(zip(*batch))[2]))
             true_length = np.array((list(zip(*batch))[1]))
             true_slot = true_slot[:, :slot_pred_length]
