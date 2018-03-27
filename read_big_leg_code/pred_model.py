@@ -1,16 +1,17 @@
 # coding=utf-8
 # @author: cer
 import tensorflow as tf
-from read_big_leg_code.data import *
-from read_big_leg_code.model import Model
-from read_big_leg_code.my_metrics import *
+from data import *
+from model import Model
+from my_metrics import *
 from tensorflow.python import debug as tf_debug
 import numpy as np
 from data_utils import k_fold
 import fastText as fasttext
 import os
+import pickle
 
-ckpt_path = '/Users/huangpeisong/Desktop/task-slu-tencent.dingdang/rnn/ckpt'
+ckpt_path = './ckpt2/'
 input_steps = 30
 embedding_size = 300
 # lstm 隐藏层单元参数的大小
@@ -21,18 +22,16 @@ batch_size = 64
 # lstm输出的槽值大小
 slot_size = 30
 # 迭代多少次
-epoch_num = 100
-enable_w2v = False
+epoch_num = 20
+enable_w2v = True
 
-train_X = np.load('/Users/huangpeisong/Desktop/task-slu-tencent.dingdang/rnn/read_big_leg_code/train_input.npy')
-train_slot_sentences = np.load(
-    '/Users/huangpeisong/Desktop/task-slu-tencent.dingdang/rnn/read_big_leg_code/train_slot.npy')
-train_Y = np.load('/Users/huangpeisong/Desktop/task-slu-tencent.dingdang/rnn/read_big_leg_code/train_intent.npy')
+train_X = np.load('train_input.npy')
+train_slot_sentences = np.load('train_slot.npy')
+train_Y = np.load('train_intent.npy')
 
-test_X = np.load('/Users/huangpeisong/Desktop/task-slu-tencent.dingdang/rnn/read_big_leg_code/test_input.npy')
-test_slot_sentences = np.load(
-    '/Users/huangpeisong/Desktop/task-slu-tencent.dingdang/rnn/read_big_leg_code/test_slot.npy')
-test_Y = np.load('/Users/huangpeisong/Desktop/task-slu-tencent.dingdang/rnn/read_big_leg_code/test_intent.npy')
+test_X = np.load('test_input.npy')
+test_slot_sentences = np.load('test_slot.npy')
+test_Y = np.load('test_intent.npy')
 
 train_data = []
 for idx in range(len(train_X)):
@@ -51,10 +50,34 @@ for idx in range(len(test_X)):
     test_data.append(tmp)
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-train_data_ed = data_pipeline(train_data, length=input_steps)
-test_data_ed = data_pipeline(test_data, length=input_steps, isTset=True)
-word2index, index2word, slot2index, index2slot, intent2index, index2intent = \
-    get_info_from_training_data(train_data_ed, test_data_ed)
+with open("train_data_ed.pkl", "rb") as fp:
+    train_data_ed = pickle.load(fp)
+
+with open("test_data_ed.pkl", "rb") as fp:
+    test_data_ed = pickle.load(fp)
+
+sentence_result = [" ".join(v[0]) for v in test_data_ed]
+result = [v[2] for v in test_data_ed]
+# # # 校对文本
+# with open("check", "w") as fp:
+#     fp.writelines(result)
+
+# 生成6份字典 分别是 句子中的词 -> 序号  序号-> 句子中的词   (slot intent 同理)
+# 这里加入测试集 只是为了 给测试集的句子中的词 也有一个编号而已
+with open("index2word_dict.pkl", "rb") as fp:
+    index2word = pickle.load(fp)
+with open("index2slot_dict.pkl", "rb") as fp:
+    index2slot = pickle.load(fp)
+with open("index2intent_dict.pkl", "rb") as fp:
+    index2intent = pickle.load(fp)
+
+with open("word2index_dict.pkl", "rb") as fp:
+    word2index = pickle.load(fp)
+with open("slot2index_dict.pkl", "rb") as fp:
+    slot2index = pickle.load(fp)
+with open("intent2index_dict.pkl", "rb") as fp:
+    intent2index = pickle.load(fp)
+
 intent_size = len(intent2index)
 vocab_size = len(word2index)
 # 接下来 完成 编码
@@ -63,11 +86,9 @@ index_test = to_index(test_data_ed, word2index, slot2index, intent2index, isTest
 
 # [self.vocab_size, self.embedding_size]
 if enable_w2v is True:
-    w2v_model_bin = "/home/bringtree/data/wiki.zh.bin"
-    w2v_model = fasttext.load_model(w2v_model_bin)
-    embedding_W = np.eye(vocab_size, embedding_size)
-    for key, value in word2index.items():
-        embedding_W[value] = w2v_model.get_word_vector(key)
+    with open("embedding_W.pkl", "rb") as fp:
+        embedding_W = pickle.load(fp)
+        embedding_W = tf.cast(embedding_W, tf.float32)
 else:
     embedding_W = None
 
@@ -79,25 +100,31 @@ def get_model():
     return model
 
 
-def print_predict():
+def train(is_debug=False):
     model = get_model()
     sess = tf.Session()
-    sess.run(tf.global_variables_initializer())
     saver = tf.train.Saver()
     ckpt = tf.train.get_checkpoint_state(ckpt_path)
-
     saver.restore(sess, os.path.join(ckpt.model_checkpoint_path))
-    for j, batch in enumerate(getBatch(batch_size, index_train, random_data=False)):
-        train_op, loss, decoder_prediction, intent, mask = model.step(sess, batch)
+    length = int(len(index_test) / 64)
+    pred_result = []
+    for batch in (testBatch(batch_size, index_test, random_data=False)):
+        decoder_prediction, intent = model.step(sess, batch, is_Test=True)
         decoder_prediction = np.transpose(decoder_prediction, [1, 0])
-        if j == 0:
-            # index = random.choice(range(len(batch)))
-            for index in range(64):
-                sen_len = batch[index][1]
-                print("Input Sentence        : ", index_seq2word(batch[index][0], index2word)[:sen_len])
-                print("Slot Prediction       : ", index_seq2slot(decoder_prediction[index], index2slot)[:sen_len])
-                print("Intent Prediction     : ", index2intent[intent[index]])
+        for index in range(64):
+            sen_len = batch[index][1]
+            pred_result.append(index2intent[intent[index]])
+            # print(index2intent[intent[index]])
+    pred_result2 = [v for v in pred_result]
+    with open("pred_result", "w") as fp:
+        fp.writelines(pred_result2)
+    different = []
+    for i in range(len(pred_result2)):
+        if result[i] != pred_result2[i]:
+            print(sentence_result[i])
+            print(result[i])
+            print(pred_result2[i])
 
 
 if __name__ == '__main__':
-    print_predict()
+    train()

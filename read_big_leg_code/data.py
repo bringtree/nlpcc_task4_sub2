@@ -97,6 +97,18 @@ def getBatch(batch_size, train_data, random_data=True):
         sindex = temp
         yield batch
 
+def testBatch(batch_size, train_data, random_data=False):
+    sindex = 0
+    eindex = batch_size
+    batch = []
+    while eindex < len(train_data):
+        batch.append(train_data[sindex:eindex])
+        temp = eindex
+        eindex = eindex + batch_size
+        sindex = temp
+
+    return batch
+
 
 def to_index(train, word2index, slot2index, intent2index, isTest=False):
     new_train = []

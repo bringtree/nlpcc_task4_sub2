@@ -66,16 +66,17 @@ with open("intent2index_dict.pkl", "rb") as fp:
 
 
 intent_size = len(intent2index)
-# vocab_size = len(word2index)
+vocab_size = len(word2index)
 # 接下来 完成 编码
-# index_train = to_index(train_data_ed, word2index, slot2index, intent2index)
-# index_test = to_index(test_data_ed, word2index, slot2index, intent2index, isTest=True)
+index_train = to_index(train_data_ed, word2index, slot2index, intent2index)
+index_test = to_index(test_data_ed, word2index, slot2index, intent2index, isTest=True)
+
+w2v_model_bin = "/home/bringtree/data/wiki.zh.bin"
+w2v_model = fasttext.load_model(w2v_model_bin)
+embedding_W = np.eye(vocab_size, embedding_size)
+for key, value in word2index.items():
+    embedding_W[value] = w2v_model.get_word_vector(key)
+
+with open("embedding_W.pkl", "wb") as fp:
+    pickle.dump(embedding_W, fp)
 #
-# w2v_model_bin = "/home/bringtree/data/wiki.zh.bin"
-# w2v_model = fasttext.load_model(w2v_model_bin)
-# embedding_W = np.eye(vocab_size, embedding_size)
-# for key, value in word2index.items():
-#     embedding_W[value] = w2v_model.get_word_vector(key)
-#
-# with open("embedding_W.pkl", "wb") as fp:
-#     pickle.dump(embedding_W, fp)
