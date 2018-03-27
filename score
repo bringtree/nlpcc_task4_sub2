@@ -1,0 +1,192 @@
+Input Sentence        :  ['播放', '不一样', '来', '一首', '我们不一样']
+Slot Prediction       :  ['O', 'O', 'O', 'O', 'song']
+Intent Prediction     :  music.play
+Input Sentence        :  ['到', '信阳市汽车配件城']
+Slot Prediction       :  ['O', 'destination']
+Intent Prediction     :  OTHERS
+Input Sentence        :  ['米静']
+Slot Prediction       :  ['O']
+Intent Prediction     :  OTHERS
+Input Sentence        :  ['信阳汽配城']
+Slot Prediction       :  ['O']
+Intent Prediction     :  OTHERS
+Input Sentence        :  ['播放', 'dj']
+Slot Prediction       :  ['O', 'song']
+Intent Prediction     :  music.play
+Input Sentence        :  ['拨通', '对方', '电话']
+Slot Prediction       :  ['O', 'O', 'phone_num']
+Intent Prediction     :  OTHERS
+Input Sentence        :  ['今天天气', '情况', '如何']
+Slot Prediction       :  ['O', 'O', 'song']
+Intent Prediction     :  music.play
+Input Sentence        :  ['我', '是', '1', '个']
+Slot Prediction       :  ['O', 'O', 'O', 'phone_num']
+Intent Prediction     :  OTHERS
+Input Sentence        :  ['导航']
+Slot Prediction       :  ['O']
+Intent Prediction     :  OTHERS
+Input Sentence        :  ['给我', '来', '一首', '追梦人']
+Slot Prediction       :  ['O', 'O', 'O', 'O']
+Intent Prediction     :  music.play
+Input Sentence        :  ['到', '邵伯镇']
+Slot Prediction       :  ['O', 'destination']
+Intent Prediction     :  navigation.navigation
+Input Sentence        :  ['李娇']
+Slot Prediction       :  ['O']
+Intent Prediction     :  music.play
+Input Sentence        :  ['哈哈哈']
+Slot Prediction       :  ['O']
+Intent Prediction     :  music.play
+Input Sentence        :  ['是', '的']
+Slot Prediction       :  ['O', 'O']
+Intent Prediction     :  music.play
+Input Sentence        :  ['九号公馆']
+Slot Prediction       :  ['O']
+Intent Prediction     :  music.play
+Input Sentence        :  ['放', '一首歌']
+Slot Prediction       :  ['O', 'O']
+Intent Prediction     :  music.play
+Input Sentence        :  ['关掉', '音乐']
+Slot Prediction       :  ['O', 'O']
+Intent Prediction     :  OTHERS
+Input Sentence        :  ['我要', '听', '又见山里红']
+Slot Prediction       :  ['O', 'O', 'O']
+Intent Prediction     :  music.play
+Input Sentence        :  ['我要', '听', '山里红']
+Slot Prediction       :  ['O', 'O', 'O']
+Intent Prediction     :  music.play
+Input Sentence        :  ['播放', '刘德华', '的', '音乐']
+Slot Prediction       :  ['O', 'O', 'O', 'O']
+Intent Prediction     :  music.play
+Input Sentence        :  ['播放', '音乐']
+Slot Prediction       :  ['O', 'O']
+Intent Prediction     :  music.play
+Input Sentence        :  ['取消']
+Slot Prediction       :  ['O']
+Intent Prediction     :  OTHERS
+Input Sentence        :  ['快点', '哦']
+Slot Prediction       :  ['O', 'destination']
+Intent Prediction     :  OTHERS
+Input Sentence        :  ['到', '大连医大一院']
+Slot Prediction       :  ['O', 'destination']
+Intent Prediction     :  OTHERS
+Input Sentence        :  ['啊', '哈哈', '那', '我', '刚', '到', '他', '被', '我', '就', '在', '延庆', '这边', '便利店', '这边', '找个', '位置']
+Slot Prediction       :  ['O', 'O', 'O', 'O', 'O', 'O', 'O', 'O', 'O', 'O', 'O', 'O', 'O', 'O', 'O', 'O', 'O']
+Intent Prediction     :  OTHERS
+Input Sentence        :  ['可以']
+Slot Prediction       :  ['O']
+Intent Prediction     :  OTHERS
+Input Sentence        :  ['放', '首歌']
+Slot Prediction       :  ['O', 'O']
+Intent Prediction     :  music.play
+Input Sentence        :  ['请', '放歌']
+Slot Prediction       :  ['O', 'O']
+Intent Prediction     :  music.play
+Input Sentence        :  ['想', '与', '你好']
+Slot Prediction       :  ['O', 'O', 'O']
+Intent Prediction     :  OTHERS
+Input Sentence        :  ['暂时', '不', '放', '歌曲']
+Slot Prediction       :  ['O', 'O', 'O', 'O']
+Intent Prediction     :  OTHERS
+Input Sentence        :  ['暂停', '播放歌曲']
+Slot Prediction       :  ['O', 'O']
+Intent Prediction     :  OTHERS
+Input Sentence        :  ['的', '理想']
+Slot Prediction       :  ['O', 'O']
+Intent Prediction     :  music.play
+Input Sentence        :  ['放', '一首', '理想']
+Slot Prediction       :  ['O', 'O', 'song']
+Intent Prediction     :  music.play
+Input Sentence        :  ['播放', '一首', '成都']
+Slot Prediction       :  ['O', 'O', 'song']
+Intent Prediction     :  music.play
+Input Sentence        :  ['打开', '酷', '我', '音乐']
+Slot Prediction       :  ['O', 'O', 'O', 'O']
+Intent Prediction     :  OTHERS
+Input Sentence        :  ['请', '帮', '我', '放', '一首', '半壶纱']
+Slot Prediction       :  ['O', 'O', 'O', 'O', 'O', 'song']
+Intent Prediction     :  music.play
+Input Sentence        :  ['请', '播放', '一首']
+Slot Prediction       :  ['O', 'O', 'O']
+Intent Prediction     :  music.play
+Input Sentence        :  ['给我', '播', '小苹果']
+Slot Prediction       :  ['O', 'O', 'O']
+Intent Prediction     :  music.play
+Input Sentence        :  ['给我', '剥', '皮皮虾']
+Slot Prediction       :  ['O', 'O', 'song']
+Intent Prediction     :  music.play
+Input Sentence        :  ['请拨', '皮皮虾我们走']
+Slot Prediction       :  ['O', 'destination']
+Intent Prediction     :  music.play
+Input Sentence        :  ['豆豆']
+Slot Prediction       :  ['O']
+Intent Prediction     :  OTHERS
+Input Sentence        :  ['阿做']
+Slot Prediction       :  ['O']
+Intent Prediction     :  OTHERS
+Input Sentence        :  ['帮', '我', '找']
+Slot Prediction       :  ['O', 'O', 'destination']
+Intent Prediction     :  OTHERS
+Input Sentence        :  ['阿丁']
+Slot Prediction       :  ['O']
+Intent Prediction     :  OTHERS
+Input Sentence        :  ['小王', '我想', '听', '八戒八戒', '心肠', '的', '歌']
+Slot Prediction       :  ['O', 'O', 'O', 'O', 'O', 'O', 'O']
+Intent Prediction     :  OTHERS
+Input Sentence        :  ['算了吧']
+Slot Prediction       :  ['O']
+Intent Prediction     :  OTHERS
+Input Sentence        :  ['关滨']
+Slot Prediction       :  ['O']
+Intent Prediction     :  OTHERS
+Input Sentence        :  ['冰英']
+Slot Prediction       :  ['O']
+Intent Prediction     :  music.play
+Input Sentence        :  ['关闭', '音乐']
+Slot Prediction       :  ['O', 'O']
+Intent Prediction     :  OTHERS
+Input Sentence        :  ['我想', '去', '中国人民保险']
+Slot Prediction       :  ['O', 'O', 'O']
+Intent Prediction     :  OTHERS
+Input Sentence        :  ['小睿']
+Slot Prediction       :  ['O']
+Intent Prediction     :  music.play
+Input Sentence        :  ['每年']
+Slot Prediction       :  ['O']
+Intent Prediction     :  OTHERS
+Input Sentence        :  ['让', '你', '睡觉']
+Slot Prediction       :  ['O', 'O', 'O']
+Intent Prediction     :  OTHERS
+Input Sentence        :  ['打电话', '给']
+Slot Prediction       :  ['O', 'O']
+Intent Prediction     :  OTHERS
+Input Sentence        :  ['来', '一首', '王菲', '的', '那年']
+Slot Prediction       :  ['O', 'O', 'O', 'O', 'song']
+Intent Prediction     :  music.play
+Input Sentence        :  ['恒晨']
+Slot Prediction       :  ['O']
+Intent Prediction     :  OTHERS
+Input Sentence        :  ['从']
+Slot Prediction       :  ['O']
+Intent Prediction     :  OTHERS
+Input Sentence        :  ['广州市']
+Slot Prediction       :  ['O']
+Intent Prediction     :  OTHERS
+Input Sentence        :  ['打电话', '给', '15300004777']
+Slot Prediction       :  ['O', 'O', 'phone_num']
+Intent Prediction     :  OTHERS
+Input Sentence        :  ['丁浩']
+Slot Prediction       :  ['O']
+Intent Prediction     :  music.play
+Input Sentence        :  ['放', '快歌', '吗']
+Slot Prediction       :  ['O', 'O', 'song']
+Intent Prediction     :  music.play
+Input Sentence        :  ['六哲', '的', '歌曲']
+Slot Prediction       :  ['O', 'O', 'O']
+Intent Prediction     :  music.play
+Input Sentence        :  ['错错错', '六哲', '的', '错错错']
+Slot Prediction       :  ['O', 'O', 'O', 'song']
+Intent Prediction     :  music.play
+Input Sentence        :  ['放', '一首', '钢琴', '的', '名', '起来', '听', '一下']
+Slot Prediction       :  ['O', 'O', 'O', 'O', 'O', 'O', 'O', 'O']
+Intent Prediction     :  OTHERS
