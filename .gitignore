@@ -40,3 +40,4 @@ ltp_data_v3.4.0
 data/
 model_graph
 *.npy
+ __pycache__/
