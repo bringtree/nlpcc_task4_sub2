@@ -14,11 +14,8 @@ if __name__ == "__main__":
     # 模型保存地址
     for k_fold_index in range(10):
         model_src = './save_model/k_fold_index' + str(k_fold_index) + '/'
-        dir = os.path.dirname(model_src)
-        try:
-            os.stat(dir)
-        except:
-            os.mkdir(dir)
+        if not os.path.exists(model_src):
+            os.makedirs(model_src)
         # 模型最佳的准确率
         best_acc = 0
         # 数据加载
