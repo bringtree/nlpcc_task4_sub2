@@ -31,8 +31,8 @@ from sklearn.model_selection import KFold
 #
 
 kf = KFold(10, shuffle=False, random_state=223)
-X = np.load("../data/new_paragraph_sentences.npy")
-Y = np.load("../data/pad_new_paragraph_labels.npy")
+X = np.load("../10_fold_corpus/train_dev_X.npy")
+Y = np.load("../10_fold_corpus/train_dev_Y.npy")
 
 train_index = []
 test_index = []

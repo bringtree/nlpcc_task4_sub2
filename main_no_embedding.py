@@ -10,6 +10,15 @@ if __name__ == "__main__":
         "embedding_words_num": 11863, "batch_size": 20, "time_step": 30, "sentences_num": 30, "intents_type_num": 12,
         "learning_rate": 0.0001, "hidden_num": 100, "enable_embedding": False, "iterations": 100
     }
+    # 模型保存地址
+    model_src = './save_model/'
+    # 模型最佳的准确率
+    best_acc = 0
+    # 数据加载
+    train_X = np.load("./10_fold_corpus/train_X_data_0.npy")
+    train_Y = np.load("./10_fold_corpus/train_Y_data_0.npy")
+    test_X = np.load("./10_fold_corpus/test_X_data_0.npy")
+    test_Y = np.load("./10_fold_corpus/test_Y_data_0.npy")
 
     model = H_RNN(
         embedding_words_num=train_args["embedding_words_num"],
@@ -25,6 +34,9 @@ if __name__ == "__main__":
     model.build_model()
     sess = tf.Session()
     sess.run(tf.global_variables_initializer())
+    saver = tf.train.Saver()
+
+
     def non_zero_times_count(sentence):
         """
         统计句子中多少个不是0（也就是有多少个单词）
@@ -37,6 +49,7 @@ if __name__ == "__main__":
                 num += 1
         return num
 
+
     if train_args["enable_embedding"] == False:
         # self.embedding = tf.placeholder(shape=[self.embedding_words_num, 300], dtype=tf.float32, name="embedding")
         with open("./data/vec_dict.pkl", 'rb') as fp:
@@ -46,22 +59,17 @@ if __name__ == "__main__":
             for key, value in vec_dict.items():
                 preprocessing_embedding_vec[key] = value
 
-    # 数据加载
-    sentences_inputs = np.load("./10_fold_corpus/train_X_data_0.npy")
-    labels_inputs = np.load("./10_fold_corpus/train_Y_data_0.npy")
 
     X_batches = []
     Y_batches = []
     begin_index = 0
     end_index = train_args['batch_size']
-    while end_index < len(sentences_inputs):
-        X_batches.append(sentences_inputs[begin_index:end_index])
-        Y_batches.append(labels_inputs[begin_index:end_index])
+    while end_index < len(train_X):
+        X_batches.append(train_X[begin_index:end_index])
+        Y_batches.append(train_Y[begin_index:end_index])
         begin_index = end_index
         end_index = end_index + train_args['batch_size']
 
-    test_X = np.load("./10_fold_corpus/test_X_data_0.npy")
-    test_Y = np.load("./10_fold_corpus/test_Y_data_0.npy")
     test_X_batches = []
     test_Y_batches = []
     test_begin_index = 0
@@ -71,7 +79,6 @@ if __name__ == "__main__":
         test_Y_batches.append(test_Y[test_begin_index:test_end_index])
         test_begin_index = test_end_index
         test_end_index = test_end_index + train_args['batch_size']
-
 
     batch_size = len(X_batches)
     test_batch_size = len(test_X_batches)
@@ -116,9 +123,7 @@ if __name__ == "__main__":
                             correct_num += 1
                         else:
                             mistake_num += 1
-        print("train_acc:" + str(correct_num / (mistake_num + correct_num)))
-
-
+        # print("train_acc:" + str(correct_num / (mistake_num + correct_num)))
 
         correct_num = 0
         mistake_num = 0
@@ -155,6 +160,9 @@ if __name__ == "__main__":
                             correct_num += 1
                         else:
                             mistake_num += 1
-
-        print("test_acc:" + str(correct_num / (mistake_num + correct_num)))
-
+        if (correct_num / (mistake_num + correct_num)) > best_acc:
+            pre_acc = correct_num / (mistake_num + correct_num)
+            saver.save(sess, model_src, global_step=epoch)
+            print("test_acc:" + str(correct_num / (mistake_num + correct_num)))
+        # else:
+        # print("test_acc:" + str(correct_num / (mistake_num + correct_num)))
