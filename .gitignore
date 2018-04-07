@@ -44,4 +44,4 @@ model_graph
 save_model/
 result[0-9]*.txt
 10_fold_corpus/
-
+result
