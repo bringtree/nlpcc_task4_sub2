@@ -31,8 +31,8 @@ for result_predict_idx in range(len(locals()["result_list_0"])):
         label_list[str(locals()[name][result_predict_idx])] += 1
     joint_result.append(sorted(label_list, key=lambda x: label_list[x])[-1])
 
-with open('./result/joint.txt', "w") as fp:
-    fp.writelines(joint_result)
+# with open('./result/joint.txt', "w") as fp:
+#     fp.writelines(joint_result)
 
 correct = 0
 mistake = 0

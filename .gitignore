@@ -42,6 +42,6 @@ model_graph
 *.npy
  __pycache__/
 save_model/
-result[0-9]*.txt
+#result[0-9]*.txt
 10_fold_corpus/
-result
+#result
