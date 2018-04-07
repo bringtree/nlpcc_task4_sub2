@@ -3,6 +3,7 @@ import tensorflow as tf
 import numpy as np
 import pickle
 import os
+
 if __name__ == "__main__":
     # !!!有bug  intents_type_num 其实应该是11 但是
 
@@ -18,6 +19,7 @@ if __name__ == "__main__":
             os.makedirs(model_src)
         # 模型最佳的准确率
         best_acc = 0
+        best_time = 0
         # 数据加载
         train_X = np.load("./10_fold_corpus/train_X_data_" + str(k_fold_index) + ".npy")
         train_Y = np.load("./10_fold_corpus/train_Y_data_" + str(k_fold_index) + ".npy")
@@ -164,9 +166,14 @@ if __name__ == "__main__":
                                 correct_num += 1
                             else:
                                 mistake_num += 1
+            if best_time > 5:
+                break
             if (correct_num / (mistake_num + correct_num)) > best_acc:
-                pre_acc = correct_num / (mistake_num + correct_num)
+                best_time = 0
+                best_acc = correct_num / (mistake_num + correct_num)
                 saver.save(sess, model_src, global_step=epoch)
                 print("test_acc:" + str(correct_num / (mistake_num + correct_num)))
+            else:
+                best_time += 1
             # else:
             # print("test_acc:" + str(correct_num / (mistake_num + correct_num)))
