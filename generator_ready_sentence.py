@@ -1,3 +1,4 @@
+# 生成将数字转化字的功能。为测试集的句子服务，使得得以复原
 import numpy as np
 import os
 import pickle
