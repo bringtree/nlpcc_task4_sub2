@@ -28,7 +28,7 @@ class H_RNN():
         self.enable_embedding = enable_embedding
 
     def build_model(self):
-        self.output_keep_prob = tf.placeholder(shape=1, dtype=tf.float32)
+        self.output_keep_prob = tf.placeholder(shape=None, dtype=tf.float32)
 
         # 存放句子的数目 【batch_size】 也就是每个对话(session)中有的句子数目
         self.sentences_number_of_session = tf.placeholder(tf.int32, self.batch_size,
