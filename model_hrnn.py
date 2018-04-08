@@ -6,7 +6,7 @@ import numpy as np
 class H_RNN():
     def __init__(self, embedding_words_num, batch_size, time_step, sentences_num, intents_type_num, learning_rate,
                  hidden_num,
-                 enable_embedding):
+                 enable_embedding, output_keep_prob):
         """
 
         :param embedding_words_num:  embedding能容纳词数量
@@ -26,6 +26,7 @@ class H_RNN():
         self.learning_rate = learning_rate
         self.hidden_num = hidden_num
         self.enable_embedding = enable_embedding
+        self.output_keep_prob = output_keep_prob
 
     def build_model(self):
         # 存放句子的数目 【batch_size】 也就是每个对话(session)中有的句子数目
@@ -50,8 +51,8 @@ class H_RNN():
         encoder_f_cell_0 = LSTMCell(self.hidden_num, initializer=tf.orthogonal_initializer())
         encoder_b_cell_0 = LSTMCell(self.hidden_num, initializer=tf.orthogonal_initializer())
 
-        encoder_f_cell_1 = DropoutWrapper(encoder_f_cell_0, output_keep_prob=0.5)
-        encoder_b_cell_1 = DropoutWrapper(encoder_b_cell_0, output_keep_prob=0.5)
+        encoder_f_cell_1 = DropoutWrapper(encoder_f_cell_0, output_keep_prob=self.output_keep_prob)
+        encoder_b_cell_1 = DropoutWrapper(encoder_b_cell_0, output_keep_prob=self.output_keep_prob)
 
         def build_sentence_LSTM(input_embedding, encoder_inputs_actual_length):
             """
@@ -96,8 +97,8 @@ class H_RNN():
             top_f_cell_0 = LSTMCell(self.hidden_num, initializer=tf.orthogonal_initializer())
             top_b_cell_0 = LSTMCell(self.hidden_num, initializer=tf.orthogonal_initializer())
 
-            top_f_cell_1 = DropoutWrapper(top_f_cell_0, output_keep_prob=0.5)
-            top_b_cell_1 = DropoutWrapper(top_b_cell_0, output_keep_prob=0.5)
+            top_f_cell_1 = DropoutWrapper(top_f_cell_0, output_keep_prob=self.output_keep_prob)
+            top_b_cell_1 = DropoutWrapper(top_b_cell_0, output_keep_prob=self.output_keep_prob)
             # 【time_step，batch_size，hidden_cell】
             (top_fw_outputs, top_bw_outputs), (top_fw_final_state, top_bw_final_state) \
                 = tf.nn.bidirectional_dynamic_rnn(cell_fw=top_f_cell_1,
