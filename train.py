@@ -10,7 +10,7 @@ if __name__ == "__main__":
     train_args = {
         "embedding_words_num": 11863, "batch_size": 64, "time_step": 30, "sentences_num": 30, "intents_type_num": 12,
         "learning_rate": 0.0001, "hidden_num": 100, "enable_embedding": False, "iterations": 100,
-        "output_keep_prob": 0.5
+        "train_output_keep_prob": 0.5, "test_output_keep_prob": 1
     }
     # 数据集的序号 k_fold_index
     # 模型保存地址
@@ -38,7 +38,6 @@ if __name__ == "__main__":
             learning_rate=train_args["learning_rate"],
             hidden_num=train_args["hidden_num"],
             enable_embedding=train_args["enable_embedding"],
-            output_keep_prob=train_args["output_keep_prob"]
         )
 
         model.build_model()
@@ -117,10 +116,12 @@ if __name__ == "__main__":
 
                 # 投入训练
                 loss, _ = model.train(sess, words_number_of_sentence, sentences_number_of_session, X_batch, Y_batch,
-                                      preprocessing_embedding_vec)
+                                      train_output_keep_prob=train_args["train_output_keep_prob"],
+                                      embedding_W=preprocessing_embedding_vec)
                 # 统计下个数
                 predict = model.get_result(sess, words_number_of_sentence, sentences_number_of_session, X_batch,
-                                           preprocessing_embedding_vec)
+                                           test_output_keep_prob=train_args["test_output_keep_prob"],
+                                           embedding_W=preprocessing_embedding_vec)
 
                 for batch_size_idx, batch_size_content in enumerate(Y_batch):
                     for sentence_idx, sentence_intent in enumerate(batch_size_content):
@@ -157,7 +158,8 @@ if __name__ == "__main__":
 
                 # 统计下个数
                 predict = model.get_result(sess, words_number_of_sentence, sentences_number_of_session, X_batch,
-                                           preprocessing_embedding_vec)
+                                           test_output_keep_prob=train_args["test_output_keep_prob"],
+                                           embedding_W=preprocessing_embedding_vec)
 
                 for batch_size_idx, batch_size_content in enumerate(Y_batch):
                     for sentence_idx, sentence_intent in enumerate(batch_size_content):
