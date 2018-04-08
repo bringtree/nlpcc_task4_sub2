@@ -6,7 +6,7 @@ import numpy as np
 class H_RNN():
     def __init__(self, embedding_words_num, batch_size, time_step, sentences_num, intents_type_num, learning_rate,
                  hidden_num,
-                 enable_embedding, output_keep_prob):
+                 enable_embedding):
         """
 
         :param embedding_words_num:  embedding能容纳词数量
@@ -26,9 +26,10 @@ class H_RNN():
         self.learning_rate = learning_rate
         self.hidden_num = hidden_num
         self.enable_embedding = enable_embedding
-        self.output_keep_prob = output_keep_prob
 
     def build_model(self):
+        self.output_keep_prob = tf.placeholder(shape=1, dtype=tf.float32)
+
         # 存放句子的数目 【batch_size】 也就是每个对话(session)中有的句子数目
         self.sentences_number_of_session = tf.placeholder(tf.int32, self.batch_size,
                                                           name="sentences_number_of_session")
@@ -94,21 +95,17 @@ class H_RNN():
                                                                  dtype=(tf.float32, tf.float32))
 
         with tf.variable_scope('top_encoder_layer'):
-            top_f_cell_0 = LSTMCell(self.hidden_num, initializer=tf.orthogonal_initializer())
-            top_b_cell_0 = LSTMCell(self.hidden_num, initializer=tf.orthogonal_initializer())
-
-            top_f_cell_1 = DropoutWrapper(top_f_cell_0, output_keep_prob=self.output_keep_prob)
-            top_b_cell_1 = DropoutWrapper(top_b_cell_0, output_keep_prob=self.output_keep_prob)
+            top_cell_0 = LSTMCell(self.hidden_num, initializer=tf.orthogonal_initializer())
+            top_cell_1 = DropoutWrapper(top_cell_0, output_keep_prob=self.output_keep_prob)
             # 【time_step，batch_size，hidden_cell】
-            (top_fw_outputs, top_bw_outputs), (top_fw_final_state, top_bw_final_state) \
-                = tf.nn.bidirectional_dynamic_rnn(cell_fw=top_f_cell_1,
-                                                  cell_bw=top_b_cell_1,
-                                                  inputs=all_encoder_final_state,
-                                                  sequence_length=self.sentences_number_of_session,
-                                                  dtype=tf.float32,
-                                                  time_major=True)
+            (top_outputs), (top_fw_final_state) \
+                = tf.nn.dynamic_rnn(cell=top_cell_1,
+                                    inputs=all_encoder_final_state,
+                                    sequence_length=self.sentences_number_of_session,
+                                    dtype=tf.float32,
+                                    time_major=True)
         # [time_step,batch_size,hidden_num*2]
-        self.top_outputs = tf.concat((top_fw_outputs, top_bw_outputs), 2)
+        self.top_outputs = top_outputs
         # [barch_size,hidden_num,hidden_num*2]
         self.top_outputs = tf.transpose(self.top_outputs, perm=[1, 0, 2])
 
@@ -116,11 +113,11 @@ class H_RNN():
         self.the_true_inputs = tf.placeholder(shape=[self.batch_size, None], dtype=tf.int32, name="the_true_inputs")
 
         # 顶层输出。为什么要reshape。因为没有3维的乘法(不能说没有吧 可以自己造个乘法 比如卷积?_?)。所以要降维成2维矩阵。才有矩阵乘法
-        self.top_outputs = tf.reshape(self.top_outputs, [-1, self.hidden_num * 2])
+        self.top_outputs = tf.reshape(self.top_outputs, [-1, self.hidden_num])
 
         # 参数W
         intent_W = tf.get_variable(
-            initializer=tf.random_uniform([self.hidden_num * 2, self.intents_type_num], -0.1, 0.1),
+            initializer=tf.random_uniform([self.hidden_num, self.intents_type_num], -0.1, 0.1),
             dtype=tf.float32, name="intent_W")
         # 参数B
         intent_b = tf.get_variable(initializer=tf.zeros([self.intents_type_num]), dtype=tf.float32, name="intent_b")
@@ -139,10 +136,11 @@ class H_RNN():
         # 计算哪些是空白输入 哪些是真实有输入的。 具体用法见这个
         # https://github.com/bringtree/everydayCommond/issues/77
         self.mask = tf.to_float(tf.not_equal(self.the_true_inputs, 0))
+
+        regularization_cost = 0.001 * tf.reduce_sum([tf.nn.l2_loss(v) for v in tf.trainable_variables()])
         self.loss = tf.contrib.seq2seq.sequence_loss(logits=self.top_outputs,
                                                      targets=self.the_true_inputs,
-                                                     weights=self.mask)
-
+                                                     weights=self.mask) + regularization_cost
         # 梯度函数
         optimizer = tf.train.AdamOptimizer(name="a_optimizer", learning_rate=self.learning_rate)
         self.grads, self.vars = zip(*optimizer.compute_gradients(self.loss))
@@ -150,7 +148,7 @@ class H_RNN():
         self.train_op = optimizer.apply_gradients(zip(self.gradients, self.vars))
 
     def train(self, sess, words_number_of_sentence, sentences_number_of_session, encoder_inputs, the_true_inputs,
-              embedding_W=None):
+              train_output_keep_prob,embedding_W=None):
         """
 
         :param sess:
@@ -166,7 +164,8 @@ class H_RNN():
                 self.words_number_of_sentence: words_number_of_sentence,
                 self.sentences_number_of_session: sentences_number_of_session,
                 self.encoder_inputs: encoder_inputs,
-                self.the_true_inputs: the_true_inputs
+                self.the_true_inputs: the_true_inputs,
+                self.output_keep_prob: train_output_keep_prob
             })
         else:
             loss = sess.run([self.loss, self.train_op], feed_dict={
@@ -174,11 +173,13 @@ class H_RNN():
                 self.sentences_number_of_session: sentences_number_of_session,
                 self.encoder_inputs: encoder_inputs,
                 self.the_true_inputs: the_true_inputs,
-                self.embedding: embedding_W
+                self.embedding: embedding_W,
+                self.output_keep_prob: train_output_keep_prob
             })
         return loss
 
-    def get_result(self, sess, words_number_of_sentence, sentences_number_of_session, encoder_inputs, embedding_W=None):
+    def get_result(self, sess, words_number_of_sentence, sentences_number_of_session, encoder_inputs,
+                   test_output_keep_prob, embedding_W=None):
         """
         返回batch_size个大小的30个句子的意图输出 shape: [batch_size,sentences_num,intents_type_num]
         :param sess:
@@ -192,6 +193,7 @@ class H_RNN():
                 self.words_number_of_sentence: words_number_of_sentence,
                 self.sentences_number_of_session: sentences_number_of_session,
                 self.encoder_inputs: encoder_inputs,
+                self.output_keep_prob: test_output_keep_prob
             })
             return predict_result
         else:
@@ -199,6 +201,8 @@ class H_RNN():
                 self.words_number_of_sentence: words_number_of_sentence,
                 self.sentences_number_of_session: sentences_number_of_session,
                 self.encoder_inputs: encoder_inputs,
-                self.embedding: embedding_W
+                self.embedding: embedding_W,
+                self.output_keep_prob: test_output_keep_prob
+
             })
             return predict_result
