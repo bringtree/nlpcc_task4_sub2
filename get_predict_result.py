@@ -7,8 +7,9 @@ import os
 if __name__ == "__main__":
     # !!!有bug  intents_type_num 其实应该是11 但是
     train_args = {
-        "embedding_words_num": 11863, "batch_size": 20, "time_step": 30, "sentences_num": 30, "intents_type_num": 12,
-        "learning_rate": 0.0001, "hidden_num": 100, "enable_embedding": False, "iterations": 100
+        "embedding_words_num": 11863, "batch_size": 64, "time_step": 30, "sentences_num": 30, "intents_type_num": 12,
+        "learning_rate": 0.0001, "hidden_num": 100, "enable_embedding": False, "iterations": 100,
+        "output_keep_prob": 1
     }
     # 数据集的序号 k_fold_index
     # 模型保存地址
@@ -43,7 +44,8 @@ if __name__ == "__main__":
             intents_type_num=train_args["intents_type_num"],
             learning_rate=train_args["learning_rate"],
             hidden_num=train_args["hidden_num"],
-            enable_embedding=train_args["enable_embedding"]
+            enable_embedding=train_args["enable_embedding"],
+            output_keep_prob = train_args["output_keep_prob"]
         )
 
         model.build_model()
