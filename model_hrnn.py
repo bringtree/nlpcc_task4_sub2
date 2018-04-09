@@ -137,10 +137,13 @@ class H_RNN():
         # https://github.com/bringtree/everydayCommond/issues/77
         self.mask = tf.to_float(tf.not_equal(self.the_true_inputs, 0))
 
-        regularization_cost = 0.001 * tf.reduce_sum([tf.nn.l2_loss(v) for v in tf.trainable_variables()])
+        # regularization_cost = 0.001 * tf.reduce_sum([tf.nn.l2_loss(v) for v in tf.trainable_variables()])
+        # self.loss = tf.contrib.seq2seq.sequence_loss(logits=self.top_outputs,
+        #                                              targets=self.the_true_inputs,
+        #                                              weights=self.mask) + regularization_cost
         self.loss = tf.contrib.seq2seq.sequence_loss(logits=self.top_outputs,
                                                      targets=self.the_true_inputs,
-                                                     weights=self.mask) + regularization_cost
+                                                     weights=self.mask)
         # 梯度函数
         optimizer = tf.train.AdamOptimizer(name="a_optimizer", learning_rate=self.learning_rate)
         self.grads, self.vars = zip(*optimizer.compute_gradients(self.loss))
