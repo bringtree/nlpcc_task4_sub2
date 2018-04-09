@@ -43,7 +43,7 @@ if __name__ == "__main__":
         model.build_model()
         sess = tf.Session()
         sess.run(tf.global_variables_initializer())
-        saver = tf.train.Saver()
+        saver = tf.train.Saver(max_to_keep=2)
 
 
         def non_zero_times_count(sentence):
