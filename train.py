@@ -8,7 +8,7 @@ if __name__ == "__main__":
     # !!!有bug  intents_type_num 其实应该是11 但是
 
     train_args = {
-        "embedding_words_num": 11863, "batch_size": 64, "time_step": 30, "sentences_num": 30, "intents_type_num": 12,
+        "embedding_words_num": 11863, "batch_size": 20, "time_step": 30, "sentences_num": 30, "intents_type_num": 12,
         "learning_rate": 0.0001, "hidden_num": 100, "enable_embedding": False, "iterations": 100,
         "train_output_keep_prob": 0.5, "test_output_keep_prob": 1
     }
@@ -68,11 +68,29 @@ if __name__ == "__main__":
                 for key, value in vec_dict.items():
                     preprocessing_embedding_vec[key] = value
 
+        # 填充0使得能被batch_size 整除
+        train_X = np.concatenate((train_X,
+                                  np.zeros(shape=(train_args["batch_size"] - len(train_X) % train_args["batch_size"],
+                                                  train_args["sentences_num"], train_args["time_step"]),
+                                           dtype=np.int32)), axis=0)
+        train_Y = np.concatenate((train_Y,
+                                  np.zeros(shape=(train_args["batch_size"] - len(train_X) % train_args["batch_size"],
+                                                  train_args["sentences_num"]),
+                                           dtype=np.int32)), axis=0)
+        test_X = np.concatenate((test_X,
+                                  np.zeros(shape=(train_args["batch_size"] - len(test_X) % train_args["batch_size"],
+                                                  train_args["sentences_num"], train_args["time_step"]),
+                                           dtype=np.int32)), axis=0)
+        test_Y = np.concatenate((test_Y,
+                                  np.zeros(shape=(train_args["batch_size"] - len(test_Y) % train_args["batch_size"],
+                                                  train_args["sentences_num"]),
+                                           dtype=np.int32)), axis=0)
+
         X_batches = []
         Y_batches = []
         begin_index = 0
         end_index = train_args['batch_size']
-        while end_index < len(train_X):
+        while end_index <= len(train_X):
             X_batches.append(train_X[begin_index:end_index])
             Y_batches.append(train_Y[begin_index:end_index])
             begin_index = end_index
@@ -82,7 +100,7 @@ if __name__ == "__main__":
         test_Y_batches = []
         test_begin_index = 0
         test_end_index = train_args['batch_size']
-        while test_end_index < len(test_X):
+        while test_end_index <= len(test_X):
             test_X_batches.append(test_X[test_begin_index:test_end_index])
             test_Y_batches.append(test_Y[test_begin_index:test_end_index])
             test_begin_index = test_end_index

@@ -15,7 +15,7 @@ if __name__ == "__main__":
     # 模型保存地址
     for k_fold_index in range(10):
         # 模型的路径
-        model_src = './save_model/k_fold_index' + str(k_fold_index) + '/'
+        model_src = './save_model_batch_size_20/k_fold_index' + str(k_fold_index) + '/'
         # 数据加载
         # test_X = np.load("./10_fold_corpus/test_X_data_" + str(k_fold_index) + ".npy")
         test_X = np.load("./10_fold_corpus/test_X.npy")
