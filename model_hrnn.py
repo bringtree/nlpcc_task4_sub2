@@ -4,7 +4,8 @@ import numpy as np
 
 
 class H_RNN():
-    def __init__(self, embedding_words_num, batch_size, time_step, sentences_num, intents_type_num, learning_rate,
+    def __init__(self, embedding_words_num, vec_size, batch_size, time_step, sentences_num, intents_type_num,
+                 learning_rate,
                  hidden_num,
                  enable_embedding):
         """
@@ -19,6 +20,7 @@ class H_RNN():
         :param enable_embedding: False为使用自己预先处理的词向量。True为使用模型自己来训练词向量
         """
         self.embedding_words_num = embedding_words_num
+        self.vec_size = vec_size
         self.time_step = time_step
         self.batch_size = batch_size
         self.sentences_num = sentences_num
@@ -42,9 +44,9 @@ class H_RNN():
                                              name='encoder_inputs')
         if self.enable_embedding is True:
             # shape = self.batch_size, self.sentences_num_actual
-            self.embedding = tf.get_variable(shape=[self.embedding_words_num, 300], dtype=tf.float32, name="embedding")
+            self.embedding = tf.get_variable(shape=[self.embedding_words_num, self.vec_size], dtype=tf.float32, name="embedding")
         else:
-            self.embedding = tf.placeholder(shape=[self.embedding_words_num, 300], dtype=tf.float32, name="embedding")
+            self.embedding = tf.placeholder(shape=[self.embedding_words_num, self.vec_size], dtype=tf.float32, name="embedding")
 
         # shape = [session中的句子长度,句子中单词长度,batch_size大小,词向量长度]
         self.encoder_input_embeddings = tf.nn.embedding_lookup(self.embedding, self.encoder_inputs)
@@ -151,7 +153,7 @@ class H_RNN():
         self.train_op = optimizer.apply_gradients(zip(self.gradients, self.vars))
 
     def train(self, sess, words_number_of_sentence, sentences_number_of_session, encoder_inputs, the_true_inputs,
-              train_output_keep_prob,embedding_W=None):
+              train_output_keep_prob, embedding_W=None):
         """
 
         :param sess:
@@ -159,7 +161,7 @@ class H_RNN():
         :param sentences_number_of_session:  存放句子的数目 【batch_size】 也就是每个对话(session)中有的句子数目
         :param encoder_inputs: 所有输入。填充要做上。[句子数目，句子长度，batch_size]
         :param the_true_inputs: 真实的输出结果，填充要做上
-        :param embedding_W: None为使用模型自己训练的词向量。不让自己要带上。shape [self.embedding_words_num, 300]
+        :param embedding_W: None为使用模型自己训练的词向量。不让自己要带上。shape [self.embedding_words_num, self.vec_size]
         :return: 返回loss大小。忘记是个值 还是一个矩阵了。。。 看api 看上去 应该是个值吧。但是 交叉商一般返回是个矩阵。自己试一试吧。我机子一个batch_size都跑不动。
         """
         if self.enable_embedding is True:

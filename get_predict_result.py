@@ -7,15 +7,15 @@ import os
 if __name__ == "__main__":
     # !!!有bug  intents_type_num 其实应该是11 但是
     train_args = {
-        "embedding_words_num": 11863, "batch_size": 64, "time_step": 30, "sentences_num": 30, "intents_type_num": 12,
-        "learning_rate": 0.0001, "hidden_num": 100, "enable_embedding": False, "iterations": 100,
-        "test_output_keep_prob": 1
+        "embedding_words_num": 11863, "vec_size": 400, "batch_size": 20, "time_step": 30, "sentences_num": 30,
+        "intents_type_num": 12, "learning_rate": 0.0001, "hidden_num": 100, "enable_embedding": False,
+        "iterations": 100,"train_output_keep_prob": 0.5, "test_output_keep_prob": 1
     }
     # 数据集的序号 k_fold_index
     # 模型保存地址
     for k_fold_index in range(10):
         # 模型的路径
-        model_src = './save_model_batch_size_20/k_fold_index' + str(k_fold_index) + '/'
+        model_src = './save_model_batch_size_hidden_200_fix/k_fold_index' + str(k_fold_index) + '/'
         # 数据加载
         # test_X = np.load("./10_fold_corpus/test_X_data_" + str(k_fold_index) + ".npy")
         test_X = np.load("./10_fold_corpus/test_X.npy")
@@ -45,6 +45,7 @@ if __name__ == "__main__":
             learning_rate=train_args["learning_rate"],
             hidden_num=train_args["hidden_num"],
             enable_embedding=train_args["enable_embedding"],
+            vec_size=train_args["vec_size"]
         )
 
         model.build_model()
@@ -77,9 +78,12 @@ if __name__ == "__main__":
                 preprocessing_embedding_vec = np.eye(len(vec_dict) + 1, 300)
                 for key, value in vec_dict.items():
                     preprocessing_embedding_vec[key] = value
+        test_X = np.concatenate((test_X,
+                                  np.zeros(shape=(train_args["batch_size"] - len(test_X) % train_args["batch_size"],
+                                                  train_args["sentences_num"], train_args["time_step"]),
+                                           dtype=np.int32)), axis=0)
 
         test_X_batches = []
-        test_Y_batches = []
         test_begin_index = 0
         test_end_index = train_args['batch_size']
         while test_end_index < len(test_X):

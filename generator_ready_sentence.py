@@ -7,8 +7,9 @@ if __name__ == "__main__":
     # !!!有bug  intents_type_num 其实应该是11 但是
 
     train_args = {
-        "embedding_words_num": 11863, "batch_size": 20, "time_step": 30, "sentences_num": 30, "intents_type_num": 12,
-        "learning_rate": 0.0001, "hidden_num": 100, "enable_embedding": False, "iterations": 100
+        "embedding_words_num": 11863, "vec_size": 400, "batch_size": 20, "time_step": 30, "sentences_num": 30,
+        "intents_type_num": 12, "learning_rate": 0.0001, "hidden_num": 100, "enable_embedding": False,
+        "iterations": 100,"train_output_keep_prob": 0.5, "test_output_keep_prob": 1
     }
     # 数据集的序号 k_fold_index
     # 模型保存地址
@@ -35,6 +36,14 @@ if __name__ == "__main__":
         return num
 
 
+    test_X = np.concatenate((test_X,
+                             np.zeros(shape=(train_args["batch_size"] - len(test_X) % train_args["batch_size"],
+                                             train_args["sentences_num"], train_args["time_step"]),
+                                      dtype=np.int32)), axis=0)
+    test_Y = np.concatenate((test_Y,
+                             np.zeros(shape=(train_args["batch_size"] - len(test_Y) % train_args["batch_size"],
+                                             train_args["sentences_num"]),
+                                      dtype=np.int32)), axis=0)
     test_X_batches = []
     test_begin_index = 0
     test_end_index = train_args['batch_size']
