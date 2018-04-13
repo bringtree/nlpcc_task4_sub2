@@ -4,6 +4,7 @@ import numpy as np
 import pickle
 import os
 
+os.chdir("../")
 if __name__ == "__main__":
     # !!!有bug  intents_type_num 其实应该是11 但是
     train_args = {
@@ -11,14 +12,14 @@ if __name__ == "__main__":
         "intents_type_num": 12, "learning_rate": 0.0001, "hidden_num": 100, "enable_embedding": False,
         "iterations": 100,"train_output_keep_prob": 0.5, "test_output_keep_prob": 1
     }
+    # 数据加载
+    test_X = np.load("./10_fold_corpus/test_X.npy")
+
     # 数据集的序号 k_fold_index
     # 模型保存地址
     for k_fold_index in range(10):
         # 模型的路径
         model_src = './save_model_batch_size_hidden_200_fix/k_fold_index' + str(k_fold_index) + '/'
-        # 数据加载
-        # test_X = np.load("./10_fold_corpus/test_X_data_" + str(k_fold_index) + ".npy")
-        test_X = np.load("./10_fold_corpus/test_X.npy")
         # 输出的结果
         result = []
         # 加载意图标签的字典

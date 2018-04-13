@@ -1,4 +1,5 @@
 import os
+os.chdir("../")
 
 for k_fold_index in range(10):
     name = 'result_list_' + str(k_fold_index)

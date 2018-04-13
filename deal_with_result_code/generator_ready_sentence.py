@@ -2,6 +2,7 @@
 import numpy as np
 import os
 import pickle
+os.chdir("../")
 
 if __name__ == "__main__":
     # !!!有bug  intents_type_num 其实应该是11 但是
@@ -59,9 +60,7 @@ if __name__ == "__main__":
                 if tmp != []:
                     result.append("".join(tmp))
 
-        # 统计下个数
-        # predict = model.get_result(sess, words_number_of_sentence, sentences_number_of_session, X_batch,
-        #                            preprocessing_embedding_vec)
+
 
     with open("./result/sentence.txt", "w") as fp:
         result = [v + '\n' for v in result]
