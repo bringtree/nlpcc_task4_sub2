@@ -47,3 +47,10 @@ save_model/
 #result
 model_graph*
 save_model*
+result/
+
+*.png
+
+*.csv
+
+*.md
