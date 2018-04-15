@@ -8,32 +8,70 @@ os.chdir("../")
 if __name__ == "__main__":
     # !!!有bug  intents_type_num 其实应该是11 但是
     train_args = {
-        "embedding_words_num": 11863, "vec_size": 400, "batch_size": 20, "time_step": 30, "sentences_num": 30,
-        "intents_type_num": 12, "learning_rate": 0.0001, "hidden_num": 100, "enable_embedding": False,
+        "embedding_words_num": 12515, "vec_size": 300, "batch_size": 20, "time_step": 30, "sentences_num": 30,
+        "intents_type_num": 12, "learning_rate": 0.0001, "hidden_num": 200, "enable_embedding": False,
         "iterations": 100,"train_output_keep_prob": 0.5, "test_output_keep_prob": 1
     }
     # 数据加载
     test_X = np.load("./10_fold_corpus/test_X.npy")
 
+    # 加载意图标签的字典
+    labels_dict = {}
+    with open("./data/labels.txt") as fp:
+        labels_type = [v[:-1] for v in fp.readlines()]
+    label_dict = {}
+    i = 1
+    for v in labels_type:
+        label_dict[v] = i
+        i += 1
+    labels_dict_reverse = {}
+    for key, value in label_dict.items():
+        labels_dict_reverse[str(value)] = key
+
+
+    def non_zero_times_count(sentence):
+        """
+        统计句子中多少个不是0（也就是有多少个单词）
+        :param sentence:
+        :return:
+        """
+        num = 0
+        for v in sentence:
+            if v != 0:
+                num += 1
+        return num
+
+
+    if train_args["enable_embedding"] == False:
+        # self.embedding = tf.placeholder(shape=[self.embedding_words_num, 300], dtype=tf.float32, name="embedding")
+        with open("./data/vec_dict.pkl", 'rb') as fp:
+            vec_dict = pickle.load(fp)
+            # 没有0的
+            preprocessing_embedding_vec = np.eye(len(vec_dict) + 1, train_args["vec_size"])
+            for key, value in vec_dict.items():
+                preprocessing_embedding_vec[key] = value
+    test_X = np.concatenate((test_X,
+                             np.zeros(shape=(train_args["batch_size"] - len(test_X) % train_args["batch_size"],
+                                             train_args["sentences_num"], train_args["time_step"]),
+                                      dtype=np.int32)), axis=0)
+
+    test_X_batches = []
+    test_begin_index = 0
+    test_end_index = train_args['batch_size']
+    while test_end_index < len(test_X):
+        test_X_batches.append(test_X[test_begin_index:test_end_index])
+        test_begin_index = test_end_index
+        test_end_index = test_end_index + train_args['batch_size']
+
+    test_batch_size = len(test_X_batches)
+
     # 数据集的序号 k_fold_index
     # 模型保存地址
     for k_fold_index in range(10):
         # 模型的路径
-        model_src = './save_model_batch_size_hidden_200_fix/k_fold_index' + str(k_fold_index) + '/'
+        model_src = './save_model_batch_size_hidden_200_fast/k_fold_index' + str(k_fold_index) + '/'
         # 输出的结果
         result = []
-        # 加载意图标签的字典
-        labels_dict = {}
-        with open("./data/labels.txt") as fp:
-            labels_type = [v[:-1] for v in fp.readlines()]
-        label_dict = {}
-        i = 1
-        for v in labels_type:
-            label_dict[v] = i
-            i += 1
-        labels_dict_reverse = {}
-        for key, value in label_dict.items():
-            labels_dict_reverse[str(value)] = key
 
         tf.reset_default_graph()
 
@@ -57,42 +95,6 @@ if __name__ == "__main__":
         ckpt = tf.train.get_checkpoint_state(model_src)
         saver.restore(sess, os.path.join(ckpt.model_checkpoint_path))
 
-
-        def non_zero_times_count(sentence):
-            """
-            统计句子中多少个不是0（也就是有多少个单词）
-            :param sentence:
-            :return:
-            """
-            num = 0
-            for v in sentence:
-                if v != 0:
-                    num += 1
-            return num
-
-
-        if train_args["enable_embedding"] == False:
-            # self.embedding = tf.placeholder(shape=[self.embedding_words_num, 300], dtype=tf.float32, name="embedding")
-            with open("./data/vec_dict.pkl", 'rb') as fp:
-                vec_dict = pickle.load(fp)
-                # 没有0的
-                preprocessing_embedding_vec = np.eye(len(vec_dict) + 1, 300)
-                for key, value in vec_dict.items():
-                    preprocessing_embedding_vec[key] = value
-        test_X = np.concatenate((test_X,
-                                  np.zeros(shape=(train_args["batch_size"] - len(test_X) % train_args["batch_size"],
-                                                  train_args["sentences_num"], train_args["time_step"]),
-                                           dtype=np.int32)), axis=0)
-
-        test_X_batches = []
-        test_begin_index = 0
-        test_end_index = train_args['batch_size']
-        while test_end_index < len(test_X):
-            test_X_batches.append(test_X[test_begin_index:test_end_index])
-            test_begin_index = test_end_index
-            test_end_index = test_end_index + train_args['batch_size']
-
-        test_batch_size = len(test_X_batches)
 
         for epoch in range(1):
 

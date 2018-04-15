@@ -7,11 +7,15 @@ import os
 from pyltp import Segmentor
 import numpy as np
 import pickle
+import jieba
 
 # 读取模型和切词的字典
 # 存在问题 英文歌曲名等等 依旧 会被切开 比如 dave ramone 会被切成 dave ramone 2个单词
-segmentor = Segmentor()
-segmentor.load_with_lexicon("../ltp_data_v3.4.0/cws.model", "../data/words_list.txt")
+# segmentor = Segmentor()
+# segmentor.load_with_lexicon("../ltp_data_v3.4.0/cws.model", "../data/words_list.txt")
+with open("../data/words_list.txt", "r") as fp:
+    for v in fp.readlines():
+        jieba.add_word(v.replace("\n", ''))
 
 with open("../data/corpus.train.txt") as fp:
     context = fp.readlines()
@@ -28,8 +32,10 @@ for sentence in context:
 for paragraphs_idx, paragraph in enumerate(paragraphs):
     for paragraph_idx, sentence in enumerate(paragraph):
         tmp = sentence.split("\t")[1:3]
-        tmp[0] = segmentor.segment(tmp[0])
-        tmp[0] = " ".join(tmp[0])
+        # tmp[0] = segmentor.segment(tmp[0])
+        # tmp[0] = " ".join(tmp[0])
+        tmp[0] = "#".join(jieba.lcut(tmp[0]))
+
         # tmp[0] 代表的是句子
         # tmp[1] 代表意图(label)
         paragraphs[paragraphs_idx][paragraph_idx] = tmp
@@ -39,9 +45,8 @@ new_paragraph_labels = []
 for paragraph in paragraphs:
     new_sentences = []
     for sentence in paragraph:
-        new_sentences.append([word for word in sentence[0].split(' ')])
+        new_sentences.append([word for word in sentence[0].split('#')])
     new_paragraph_sentences.append(new_sentences)
-
 
 # 生成字典
 all_words = []
@@ -60,7 +65,6 @@ for v in words:
     i += 1
 
 word_dict_reverse = dict(zip(word_dict.values(), word_dict.keys()))
-
 
 with open("../data/word_dict.pkl", "wb") as fp:
     pickle.dump(word_dict, fp)

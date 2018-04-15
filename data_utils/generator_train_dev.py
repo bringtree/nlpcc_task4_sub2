@@ -52,7 +52,9 @@ for i in range(len(test_index)):
     test_X.append([X[v] for v in test_index[i]])
     test_Y.append([Y[v] for v in test_index[i]])
 
+
 name = '_data_'
+
 for i in range(10):
     np.save("../10_fold_corpus/train_X" + name + str(i), train_X[i])
     np.save("../10_fold_corpus/train_Y" + name + str(i), train_Y[i])
