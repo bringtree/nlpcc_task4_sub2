@@ -5,13 +5,10 @@ import pickle
 import os
 
 os.chdir("../")
+from config import train_args, model_src
+
+os.chdir("../")
 if __name__ == "__main__":
-    # !!!有bug  intents_type_num 其实应该是11 但是
-    train_args = {
-        "embedding_words_num": 12515, "vec_size": 300, "batch_size": 20, "time_step": 30, "sentences_num": 30,
-        "intents_type_num": 12, "learning_rate": 0.0001, "hidden_num": 200, "enable_embedding": False,
-        "iterations": 100,"train_output_keep_prob": 0.5, "test_output_keep_prob": 1
-    }
     # 数据加载
     test_X = np.load("./10_fold_corpus/test_X.npy")
 
@@ -69,7 +66,7 @@ if __name__ == "__main__":
     # 模型保存地址
     for k_fold_index in range(10):
         # 模型的路径
-        model_src = './save_model_batch_size_hidden_200_fast/k_fold_index' + str(k_fold_index) + '/'
+        model_src = str(model_src) + '/k_fold_index' + str(k_fold_index) + '/'
         # 输出的结果
         result = []
 
@@ -84,7 +81,9 @@ if __name__ == "__main__":
             learning_rate=train_args["learning_rate"],
             hidden_num=train_args["hidden_num"],
             enable_embedding=train_args["enable_embedding"],
-            vec_size=train_args["vec_size"]
+            vec_size=train_args["vec_size"],
+            decay_rate=train_args["decay_rate"],
+            decay_steps=train_args["decay_steps"],
         )
 
         model.build_model()
@@ -94,7 +93,6 @@ if __name__ == "__main__":
         # 加载模型
         ckpt = tf.train.get_checkpoint_state(model_src)
         saver.restore(sess, os.path.join(ckpt.model_checkpoint_path))
-
 
         for epoch in range(1):
 

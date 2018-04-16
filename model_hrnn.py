@@ -5,9 +5,7 @@ import numpy as np
 
 class H_RNN():
     def __init__(self, embedding_words_num, vec_size, batch_size, time_step, sentences_num, intents_type_num,
-                 learning_rate,
-                 hidden_num,
-                 enable_embedding):
+                 learning_rate, hidden_num, enable_embedding, decay_rate, decay_steps):
         """
 
         :param embedding_words_num:  embedding能容纳词数量
@@ -28,6 +26,8 @@ class H_RNN():
         self.learning_rate = learning_rate
         self.hidden_num = hidden_num
         self.enable_embedding = enable_embedding
+        self.decay_rate = decay_rate
+        self.decay_steps = decay_steps
 
     def build_model(self):
         self.output_keep_prob = tf.placeholder(shape=None, dtype=tf.float32)
@@ -44,9 +44,11 @@ class H_RNN():
                                              name='encoder_inputs')
         if self.enable_embedding is True:
             # shape = self.batch_size, self.sentences_num_actual
-            self.embedding = tf.get_variable(shape=[self.embedding_words_num, self.vec_size], dtype=tf.float32, name="embedding")
+            self.embedding = tf.get_variable(shape=[self.embedding_words_num, self.vec_size], dtype=tf.float32,
+                                             name="embedding")
         else:
-            self.embedding = tf.placeholder(shape=[self.embedding_words_num, self.vec_size], dtype=tf.float32, name="embedding")
+            self.embedding = tf.placeholder(shape=[self.embedding_words_num, self.vec_size], dtype=tf.float32,
+                                            name="embedding")
 
         # shape = [session中的句子长度,句子中单词长度,batch_size大小,词向量长度]
         self.encoder_input_embeddings = tf.nn.embedding_lookup(self.embedding, self.encoder_inputs)
@@ -146,8 +148,17 @@ class H_RNN():
         self.loss = tf.contrib.seq2seq.sequence_loss(logits=self.top_outputs,
                                                      targets=self.the_true_inputs,
                                                      weights=self.mask)
+        global_step = tf.Variable(0, trainable=False)
+        global_step_add_op = tf.assign_add(global_step, 1)
+        with tf.control_dependencies([global_step_add_op]):
+            learning_rate = tf.train.exponential_decay(learning_rate=self.learning_rate,
+                                                       global_step=global_step,
+                                                       decay_steps=self.decay_steps,
+                                                       decay_rate=self.decay_rate,
+                                                       )
+
         # 梯度函数
-        optimizer = tf.train.AdamOptimizer(name="a_optimizer", learning_rate=self.learning_rate)
+        optimizer = tf.train.AdamOptimizer(name="a_optimizer", learning_rate=learning_rate)
         self.grads, self.vars = zip(*optimizer.compute_gradients(self.loss))
         self.gradients, _ = tf.clip_by_global_norm(self.grads, 5)  # clip gradients
         self.train_op = optimizer.apply_gradients(zip(self.gradients, self.vars))

@@ -3,15 +3,9 @@ import numpy as np
 import os
 import pickle
 os.chdir("../")
+from config import train_args
 
 if __name__ == "__main__":
-    # !!!有bug  intents_type_num 其实应该是11 但是
-
-    train_args = {
-        "embedding_words_num": 11863, "vec_size": 400, "batch_size": 20, "time_step": 30, "sentences_num": 30,
-        "intents_type_num": 12, "learning_rate": 0.0001, "hidden_num": 100, "enable_embedding": False,
-        "iterations": 100,"train_output_keep_prob": 0.5, "test_output_keep_prob": 1
-    }
     # 数据集的序号 k_fold_index
     # 模型保存地址
     result = []
