@@ -1,11 +1,11 @@
 # 给所有输入编码
 import os
 # 使用方法
-# from pyltp import Segmentor
+from pyltp import Segmentor
+# import jieba
 import numpy as np
 import pickle
 import keras
-import jieba
 ######################################################################
 with open("../data/word_dict.pkl", "rb") as fp:
     word_dict = pickle.load(fp)
@@ -28,11 +28,11 @@ label_dict_reverse = dict(zip(label_dict.values(), label_dict.keys()))
 ######################################################################
 
 # 读取模型和切词的字典
-# segmentor = Segmentor()
-# segmentor.load_with_lexicon("../ltp_data_v3.4.0/cws.model", "../data/words_list.txt")
-with open("../data/words_list.txt", "r") as fp:
-    for v in fp.readlines():
-        jieba.add_word(v.replace("\n", ''))
+segmentor = Segmentor()
+segmentor.load_with_lexicon("../ltp_data_v3.4.0/cws.model", "../data/words_list.txt")
+# with open("../data/words_list.txt", "r") as fp:
+#     for v in fp.readlines():
+#         jieba.add_word(v.replace("\n", ''))
 
 with open("../data/corpus.train.txt") as fp:
     context = fp.readlines()
@@ -63,9 +63,9 @@ label_list = {
 for paragraphs_idx, paragraph in enumerate(paragraphs):
     for paragraph_idx, sentence in enumerate(paragraph):
         tmp = sentence.split("\t")[1:3]
-        # tmp[0] = segmentor.segment(tmp[0])
-        # tmp[0] = " ".join(tmp[0])
-        tmp[0] = "#".join(jieba.lcut(tmp[0]))
+        tmp[0] = segmentor.segment(tmp[0])
+        tmp[0] = " ".join(tmp[0])
+        # tmp[0] = "#".join(jieba.lcut(tmp[0]))
         # tmp[0] 代表的是句子
         # tmp[1] 代表意图(label)
         label_list[str(tmp[1])] +=1
@@ -79,7 +79,8 @@ for paragraph in paragraphs:
     new_paragraph = []
     for sentence in paragraph:
         # 对输入的句子编码
-        new_sentences.append([word_dict[word] for word in sentence[0].split('#')])
+        # new_sentences.append([word_dict[word] for word in sentence[0].split('#')])
+        new_sentences.append([word_dict[word] for word in sentence[0].split(' ')])
         # 对输入的句子不编码
         # new_sentences.append([word for word in sentence[0].split(' ')])
 

@@ -3,9 +3,7 @@ import tensorflow as tf
 import numpy as np
 import pickle
 import os
-
-os.chdir("../")
-from config import train_args, model_src
+from config import train_args, model_file
 
 os.chdir("../")
 if __name__ == "__main__":
@@ -66,7 +64,7 @@ if __name__ == "__main__":
     # 模型保存地址
     for k_fold_index in range(10):
         # 模型的路径
-        model_src = str(model_src) + '/k_fold_index' + str(k_fold_index) + '/'
+        model_src = str(model_file) + '/k_fold_index' + str(k_fold_index) + '/'
         # 输出的结果
         result = []
 

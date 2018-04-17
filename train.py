@@ -3,14 +3,14 @@ import tensorflow as tf
 import numpy as np
 import pickle
 import os
-from config import train_args, model_src
+from config import train_args, model_file
 
 if __name__ == "__main__":
     # !!!有bug  intents_type_num 其实应该是11 但是
     # 数据集的序号 k_fold_index
     # 模型保存地址
     for k_fold_index in range(10):
-        model_src = str(model_src) + '/k_fold_index' + str(k_fold_index) + '/'
+        model_src = str(model_file) + '/k_fold_index' + str(k_fold_index) + '/'
         if not os.path.exists(model_src):
             os.makedirs(model_src)
         # 模型最佳的准确率
