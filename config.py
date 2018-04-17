@@ -1,9 +1,9 @@
-import configparser
+# import configparser
 
-config = configparser.ConfigParser()
-config.read('config.ini')
+# config = configparser.ConfigParser()
+# config.read('config.ini')
 train_args = {}
-train_args["embedding_words_num"] = 11863
+train_args["embedding_words_num"] = 11868
 train_args["vec_size"] = 300
 train_args["batch_size"] = 20
 train_args["time_step"] = 30
@@ -18,4 +18,4 @@ train_args["learning_rate"] = 0.001
 train_args["decay_rate"] = 0.795
 train_args["decay_steps"] = 180
 
-model_file = "./model_fasttext_200_ltp"
+model_file = "./save_model_fasttext_200_ltp_data_strong"
